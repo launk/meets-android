@@ -1,4 +1,4 @@
-package com.theagilemonkeys.meets.magento.models.base;
+package com.theagilemonkeys.meets.magento;
 
 import com.theagilemonkeys.meets.magento.models.MageMeetsAddress;
 import com.theagilemonkeys.meets.magento.models.MageMeetsCartItem;
@@ -28,4 +28,5 @@ public class MageMeetsCollectionPojos {
     public static class CartItems extends ArrayList<MageMeetsCartItem> {}
     public static class StockInfos extends ArrayList<MageStockItem> {}
     public static class Addresses extends ArrayList<MageMeetsAddress> {}
+
 }
