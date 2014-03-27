@@ -2,10 +2,10 @@ package com.theagilemonkeys.meets.magento.models;
 
 import com.google.api.client.util.Key;
 import com.theagilemonkeys.meets.ApiMethodModelHelper;
+import com.theagilemonkeys.meets.magento.MageApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.magento.methods.CatalogCategoryInfo;
 import com.theagilemonkeys.meets.magento.methods.CatalogCategoryLevel;
 import com.theagilemonkeys.meets.magento.methods.CatalogCategoryTree;
-import com.theagilemonkeys.meets.magento.models.base.MageMeetsCollectionPojos;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsCategory;
 import com.theagilemonkeys.meets.utils.StringUtils;
@@ -37,7 +37,7 @@ public class MageMeetsCategory extends MageMeetsModel<MeetsCategory> implements 
     @Key
     private int is_active;
     @Key
-    private MageMeetsCollectionPojos.Categories children = new MageMeetsCollectionPojos.Categories();
+    private MageApiMethodCollectionResponseClasses.Categories children = new MageApiMethodCollectionResponseClasses.Categories();
 
     @Override
     public MeetsCategory fetch() {
@@ -67,7 +67,7 @@ public class MageMeetsCategory extends MageMeetsModel<MeetsCategory> implements 
                 .done(new DoneCallback() {
                     @Override
                     public void onDone(Object result) {
-                        children = (MageMeetsCollectionPojos.Categories) result;
+                        children = (MageApiMethodCollectionResponseClasses.Categories) result;
                     }
                 })
                 .always(onlyTrigger);
@@ -132,7 +132,7 @@ public class MageMeetsCategory extends MageMeetsModel<MeetsCategory> implements 
 //    @Override
 //    protected void updateFromFetchedResult(Object fetchedResult) {
 //        if ( onlyChildren )
-//            children = (MageMeetsCollectionPojos.Categories) fetchedResult;
+//            children = (MageApiMethodCollectionResponseClasses.Categories) fetchedResult;
 //        else
 //            super.updateFromFetchedResult(fetchedResult);
 //    }

@@ -1,7 +1,7 @@
 package com.theagilemonkeys.meets.magento.methods;
 
 import com.theagilemonkeys.meets.magento.SoapApiMethod;
-import com.theagilemonkeys.meets.magento.models.base.MageMeetsCollectionPojos;
+import com.theagilemonkeys.meets.models.base.MeetsFactory;
 
 /**
  * Android Meets SDK
@@ -11,7 +11,7 @@ import com.theagilemonkeys.meets.magento.models.base.MageMeetsCollectionPojos;
  */
 public class CustomerAddressList extends SoapApiMethod {
     public CustomerAddressList() {
-        super(MageMeetsCollectionPojos.Addresses.class);
+        super(MeetsFactory.get().getApiMethodCollectionResponseClasses().addressesList());
     }
 }
 

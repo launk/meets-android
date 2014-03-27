@@ -46,7 +46,7 @@ public class RestApiMethod<RESULT> extends ApiMethod<RESULT> {
                                        .setParser(new JacksonFactory().createJsonObjectParser())
                                        .execute();
 
-        Object res = response.parseAs(modelClass);
+        Object res = response.parseAs(responseClass);
 
         return (RESULT) res;
     }

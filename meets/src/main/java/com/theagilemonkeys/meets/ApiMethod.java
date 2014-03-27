@@ -1,6 +1,5 @@
 package com.theagilemonkeys.meets;
 
-import com.octo.android.robospice.exception.RequestCancelledException;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.KeySanitationExcepion;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -57,14 +56,18 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
     //////// Instance attributes and methods ///////
     protected List<String> urlExtraSegments;
     protected Map <String, Object> params;
-    protected final Class modelClass;
+    protected Class responseClass;
     protected Deferred runDeferred;
     protected long cacheDuration = globalCacheDuration.get();
     protected boolean alwaysGetFromCacheFirst = globalAlwaysGetFromCacheFirst.get();
 
-    public ApiMethod(Class<RESULT> magentoModelClass) {
-        super(magentoModelClass);
-        modelClass = magentoModelClass;
+    public ApiMethod(Class<RESULT> responseClass) {
+        super(responseClass);
+        this.responseClass = responseClass;
+    }
+
+    public void setResponseClass(Class responseClass) {
+        this.responseClass = responseClass;
     }
 
     /**

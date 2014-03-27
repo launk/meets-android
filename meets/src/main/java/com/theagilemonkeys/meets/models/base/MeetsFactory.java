@@ -1,5 +1,6 @@
 package com.theagilemonkeys.meets.models.base;
 
+import com.theagilemonkeys.meets.ApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.models.MeetsAddress;
 import com.theagilemonkeys.meets.models.MeetsCart;
 import com.theagilemonkeys.meets.models.MeetsCategory;
@@ -26,7 +27,7 @@ public abstract class MeetsFactory {
         return instance;
     }
 
-    // "instance" must provide an implementation of thefollowing methods
+    // "instance" must provide an implementation of following methods
     public abstract MeetsProduct makeProduct();
     public abstract MeetsProduct makeProduct(int id);
     public abstract MeetsCollection<MeetsProduct> makeProductCollection();
@@ -50,4 +51,6 @@ public abstract class MeetsFactory {
     public abstract MeetsStock.ItemList makeStockItemList();
     public abstract MeetsStock.ItemList makeStockItemList(int id);
     public abstract MeetsStock.ItemList makeStockItemList(List<Integer> ids);
+
+    public abstract ApiMethodCollectionResponseClasses getApiMethodCollectionResponseClasses();
 }

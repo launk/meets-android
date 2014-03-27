@@ -6,7 +6,7 @@ import com.theagilemonkeys.meets.magento.methods.CatalogProductList;
 import com.theagilemonkeys.meets.magento.methods.Products;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsProduct;
-import com.theagilemonkeys.meets.models.base.MeetsCollectionPojos;
+import com.theagilemonkeys.meets.ApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.utils.StringUtils;
 import com.theagilemonkeys.meets.utils.soap.Serializable;
 
@@ -34,7 +34,7 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     @Key private String image_url;
     @Key private Double final_price_with_tax;
     @Key private String price;
-    @Key private MeetsCollectionPojos.ListOfGenericMaps additional_attributes;
+    @Key private ApiMethodCollectionResponseClasses.ListOfGenericMaps additional_attributes;
     private List<MeetsProduct> associatedProducs;
 
     @Override
@@ -94,7 +94,7 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     }
 
     @Override
-    public Map<String, String> getImageVersions() {
+    public Map<String, String> getImages() {
         throw new UnsupportedOperationException("Still not implemented");
     }
 
@@ -110,7 +110,7 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     }
 
     @Override
-    public MeetsProduct fetchImageVersions() {
+    public MeetsProduct fetchImages() {
         return null;
     }
 

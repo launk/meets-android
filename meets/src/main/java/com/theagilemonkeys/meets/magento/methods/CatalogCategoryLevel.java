@@ -1,7 +1,7 @@
 package com.theagilemonkeys.meets.magento.methods;
 
 import com.theagilemonkeys.meets.magento.SoapApiMethod;
-import com.theagilemonkeys.meets.magento.models.base.MageMeetsCollectionPojos;
+import com.theagilemonkeys.meets.models.base.MeetsFactory;
 
 /**
  * Android Meets SDK
@@ -11,7 +11,7 @@ import com.theagilemonkeys.meets.magento.models.base.MageMeetsCollectionPojos;
  */
 public class CatalogCategoryLevel extends SoapApiMethod {
     public CatalogCategoryLevel() {
-        super(MageMeetsCollectionPojos.Categories.class);
+        super(MeetsFactory.get().getApiMethodCollectionResponseClasses().categoriesList());
     }
 }
 

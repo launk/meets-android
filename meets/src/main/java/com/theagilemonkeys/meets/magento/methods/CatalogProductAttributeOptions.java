@@ -1,7 +1,7 @@
 package com.theagilemonkeys.meets.magento.methods;
 
 import com.theagilemonkeys.meets.magento.SoapApiMethod;
-import com.theagilemonkeys.meets.models.base.MeetsCollectionPojos;
+import com.theagilemonkeys.meets.ApiMethodCollectionResponseClasses;
 
 /**
  * Android Meets SDK
@@ -11,7 +11,7 @@ import com.theagilemonkeys.meets.models.base.MeetsCollectionPojos;
  */
 public class CatalogProductAttributeOptions extends SoapApiMethod {
     public CatalogProductAttributeOptions() {
-        super(MeetsCollectionPojos.ListOfGenericMaps.class);
+        super(ApiMethodCollectionResponseClasses.ListOfGenericMaps.class);
     }
 }
 

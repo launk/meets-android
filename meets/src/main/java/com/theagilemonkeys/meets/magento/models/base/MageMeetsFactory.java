@@ -1,5 +1,6 @@
 package com.theagilemonkeys.meets.magento.models.base;
 
+import com.theagilemonkeys.meets.magento.MageApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.magento.methods.Products;
 import com.theagilemonkeys.meets.magento.models.MageMeetsAddress;
 import com.theagilemonkeys.meets.magento.models.MageMeetsCart;
@@ -16,6 +17,7 @@ import com.theagilemonkeys.meets.models.MeetsCategory;
 import com.theagilemonkeys.meets.models.MeetsCustomer;
 import com.theagilemonkeys.meets.models.MeetsProduct;
 import com.theagilemonkeys.meets.models.MeetsStock;
+import com.theagilemonkeys.meets.ApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.models.base.MeetsCollection;
 import com.theagilemonkeys.meets.models.base.MeetsFactory;
 
@@ -40,7 +42,7 @@ public class MageMeetsFactory extends MeetsFactory {
 
     @Override
     public MeetsCollection<MeetsProduct> makeProductCollection() {
-        return new MageMeetsCollection<MeetsProduct>(Products.class);
+        return new MageMeetsCollection(Products.class);
     }
 
     @Override
@@ -122,5 +124,10 @@ public class MageMeetsFactory extends MeetsFactory {
     @Override
     public MeetsStock.ItemList makeStockItemList(List<Integer> ids) {
         return makeStockItemList().setIds(ids);
+    }
+
+    @Override
+    public ApiMethodCollectionResponseClasses getApiMethodCollectionResponseClasses() {
+        return new MageApiMethodCollectionResponseClasses();
     }
 }

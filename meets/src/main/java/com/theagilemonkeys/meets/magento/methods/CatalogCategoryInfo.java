@@ -2,6 +2,7 @@ package com.theagilemonkeys.meets.magento.methods;
 
 import com.theagilemonkeys.meets.magento.SoapApiMethod;
 import com.theagilemonkeys.meets.magento.models.MageMeetsCategory;
+import com.theagilemonkeys.meets.models.base.MeetsFactory;
 
 /**
  * Android Meets SDK
@@ -11,7 +12,7 @@ import com.theagilemonkeys.meets.magento.models.MageMeetsCategory;
  */
 public class CatalogCategoryInfo extends SoapApiMethod {
     public CatalogCategoryInfo() {
-        super(MageMeetsCategory.class);
+        super(MeetsFactory.get().makeCategory().getClass());
     }
 }
 

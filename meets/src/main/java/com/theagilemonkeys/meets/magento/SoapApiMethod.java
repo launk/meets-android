@@ -73,11 +73,11 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
 
         Object res = send(getMethodName(), params);
 
-        if ( SoapParser.isPrimitiveOrInmutable(modelClass) ){
+        if ( SoapParser.isPrimitiveOrInmutable(responseClass) ){
             return (RESULT) res;
         }
         else{
-            RESULT model = (RESULT) modelClass.newInstance();
+            RESULT model = (RESULT) responseClass.newInstance();
             parseResponse(res, model);
             return model;
         }

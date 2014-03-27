@@ -36,6 +36,7 @@ public interface MeetsAddress extends MeetsModel<MeetsAddress> {
     MeetsAddress setDefaultBilling(boolean defaultBilling);
     MeetsAddress setDefaultShipping(boolean defaultShipping);
 
+    // TODO: Quitar. Se usan los de customer
     MeetsAddress save();
     MeetsAddress remove();
 }

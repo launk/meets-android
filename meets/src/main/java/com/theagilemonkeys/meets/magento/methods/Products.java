@@ -1,8 +1,8 @@
 package com.theagilemonkeys.meets.magento.methods;
 
+import com.theagilemonkeys.meets.magento.MageApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.magento.RestApiMethod;
-import com.theagilemonkeys.meets.magento.models.MageMeetsProduct;
-import com.theagilemonkeys.meets.magento.models.base.MageMeetsCollectionPojos;
+import com.theagilemonkeys.meets.models.base.MeetsFactory;
 
 /**
  * Android Meets SDK
@@ -12,10 +12,10 @@ import com.theagilemonkeys.meets.magento.models.base.MageMeetsCollectionPojos;
  */
 public class Products extends RestApiMethod {
     public Products() {
-        super(MageMeetsProduct.class);
+        super(MeetsFactory.get().makeProduct().getClass());
     }
     public Products(boolean forCollection) {
-        super(MageMeetsCollectionPojos.ProductsMap.class);
+        super(MeetsFactory.get().getApiMethodCollectionResponseClasses().productsMap());
     }
 }
 

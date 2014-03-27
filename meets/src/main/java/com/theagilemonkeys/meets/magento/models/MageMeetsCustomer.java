@@ -3,6 +3,7 @@ package com.theagilemonkeys.meets.magento.models;
 import com.google.api.client.util.Key;
 import com.theagilemonkeys.meets.ApiMethodModelHelper;
 import com.theagilemonkeys.meets.Meets;
+import com.theagilemonkeys.meets.magento.MageApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.magento.methods.CustomerAddressCreate;
 import com.theagilemonkeys.meets.magento.methods.CustomerAddressDelete;
 import com.theagilemonkeys.meets.magento.methods.CustomerAddressList;
@@ -10,7 +11,6 @@ import com.theagilemonkeys.meets.magento.methods.CustomerCustomerCreate;
 import com.theagilemonkeys.meets.magento.methods.CustomerCustomerInfo;
 import com.theagilemonkeys.meets.magento.methods.CustomerCustomerList;
 import com.theagilemonkeys.meets.magento.methods.CustomerCustomerUpdate;
-import com.theagilemonkeys.meets.magento.models.base.MageMeetsCollectionPojos;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsAddress;
 import com.theagilemonkeys.meets.models.MeetsCustomer;
@@ -23,7 +23,6 @@ import org.jdeferred.DonePipe;
 import org.jdeferred.Promise;
 import org.jdeferred.impl.DeferredObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
     @Key private int website_id;
     @Key private String password;
     @Key private String password_hash;
-    @Key private MageMeetsCollectionPojos.Addresses addresses;
+    @Key private MageApiMethodCollectionResponseClasses.Addresses addresses;
 
     {
         store_id = Meets.storeId;
@@ -140,10 +139,12 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
     }
 
     @Override
-    public List<MeetsAddress> getAddresses() {
-        List<MeetsAddress> res = new ArrayList<MeetsAddress>();
-        if (addresses != null) res.addAll(addresses);
-        return res;
+    public List getAddresses() {
+        //TODO Remove the pojos and use the new form of getting the type of generic class in parsers
+//        List<MeetsAddress> res = new ArrayList<MeetsAddress>();
+//        if (addresses != null) res.addAll(addresses);
+//        return res;
+        return addresses;
     }
 
     private MeetsCustomer create() {
@@ -220,7 +221,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
         pushPipe(new DonePipe() {
             @Override
             public Deferred pipeDone(Object o) {
-                MageMeetsCollectionPojos.Customers customers = (MageMeetsCollectionPojos.Customers) o;
+                MageApiMethodCollectionResponseClasses.Customers customers = (MageApiMethodCollectionResponseClasses.Customers) o;
                 Exception e;
                 if (customers.size() == 0) {
                     e = new Exception("Customer not found");
@@ -269,7 +270,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                 .done(new DoneCallback() {
                     @Override
                     public void onDone(Object o) {
-                        addresses = (MageMeetsCollectionPojos.Addresses) o;
+                        addresses = (MageApiMethodCollectionResponseClasses.Addresses) o;
                     }
                 })
                 .always(onlyTrigger);
@@ -295,7 +296,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                     public void onDone(Object o) {
                         MeetsAddress resultAddress = (MeetsAddress) o;
                         meetsAddress.setId(resultAddress.getId());
-                        if (addresses == null) addresses = new MageMeetsCollectionPojos.Addresses();
+                        if (addresses == null) addresses = new MageApiMethodCollectionResponseClasses.Addresses();
 
                         // Update the default billing and shipping state in the other addresses
                         for (MeetsAddress address : addresses) {
@@ -310,6 +311,11 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                 })
                 .always(onlyTrigger);
         return this;
+    }
+
+    @Override
+    public MeetsCustomer saveAddress(MeetsAddress meetsAddress) {
+        return null; //TODO
     }
 
     @Override

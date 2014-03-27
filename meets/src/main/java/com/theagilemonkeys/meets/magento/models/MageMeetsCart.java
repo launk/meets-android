@@ -13,7 +13,7 @@ import com.theagilemonkeys.meets.magento.methods.ShoppingCartProductAdd;
 import com.theagilemonkeys.meets.magento.methods.ShoppingCartProductRemove;
 import com.theagilemonkeys.meets.magento.methods.ShoppingCartShippingList;
 import com.theagilemonkeys.meets.magento.methods.ShoppingCartShippingMethod;
-import com.theagilemonkeys.meets.magento.models.base.MageMeetsCollectionPojos;
+import com.theagilemonkeys.meets.magento.MageApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsAddress;
 import com.theagilemonkeys.meets.models.MeetsCart;
@@ -50,11 +50,11 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
     @Key private double subtotal = 0;
     @Key private double grand_total = 0;
     @Key
-    @SoapParser.ListType(MageMeetsCollectionPojos.CartItems.class)
+    @SoapParser.ListType(MageApiMethodCollectionResponseClasses.CartItems.class)
     private List<Item> items = new ArrayList<Item>();
 
-    private MageMeetsCollectionPojos.ShippingMethods shippingMethods;
-    private MageMeetsCollectionPojos.PaymentMethods paymentMethods;
+    private List<Shipping> shippingMethods;
+    private List<Payment> paymentMethods;
     private String lastOrderId;
 
     {
@@ -407,12 +407,12 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
 
     @Override
     public List<Shipping> getShippingMethods() {
-        return new ArrayList<Shipping>(shippingMethods);
+        return shippingMethods;
     }
 
     @Override
     public List<Payment> getPaymentMethods() {
-        return new ArrayList<Payment>(paymentMethods);
+        return paymentMethods;
     }
 
     @Override
@@ -431,7 +431,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                 .done(new DoneCallback() {
                     @Override
                     public void onDone(Object result) {
-                        shippingMethods = (MageMeetsCollectionPojos.ShippingMethods) result;
+                        shippingMethods = (List<Shipping>) result;
                     }
                 })
                 .always(onlyTrigger);
@@ -454,7 +454,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                 .done(new DoneCallback() {
                     @Override
                     public void onDone(Object result) {
-                        paymentMethods = (MageMeetsCollectionPojos.PaymentMethods) result;
+                        paymentMethods = (List<Payment>) result;
                     }
                 })
                 .always(onlyTrigger);

@@ -32,7 +32,9 @@ public interface MeetsCustomer extends MeetsModel<MeetsCustomer> {
     boolean checkPassword(String password);
     MeetsCustomer save();
     MeetsCustomer fetchAddresses();
+    //TODO: Quitar addAdress y hacerlo todo a través de saveAddress
     MeetsCustomer addAddress(MeetsAddress meetsAddress);
+    MeetsCustomer saveAddress(MeetsAddress meetsAddress);
     MeetsCustomer removeAddress(int addressId);
 }
 

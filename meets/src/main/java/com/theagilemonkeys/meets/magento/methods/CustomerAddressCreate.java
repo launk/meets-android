@@ -2,6 +2,7 @@ package com.theagilemonkeys.meets.magento.methods;
 
 import com.theagilemonkeys.meets.magento.SoapApiMethod;
 import com.theagilemonkeys.meets.magento.models.MageMeetsAddress;
+import com.theagilemonkeys.meets.models.base.MeetsFactory;
 
 /**
  * Android Meets SDK
@@ -11,7 +12,7 @@ import com.theagilemonkeys.meets.magento.models.MageMeetsAddress;
  */
 public class CustomerAddressCreate extends SoapApiMethod {
     public CustomerAddressCreate() {
-        super(MageMeetsAddress.class);
+        super(MeetsFactory.get().makeAddress().getClass());
     }
 
     @Override

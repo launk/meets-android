@@ -2,6 +2,8 @@ package com.theagilemonkeys.meets;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Android Meets SDK
@@ -13,25 +15,13 @@ public interface ApiMethodCollectionResponseClasses {
     public static class GenericMap extends HashMap<String, Object> {}
     public static class ListOfGenericMaps extends ArrayList<GenericMap> {}
 
-
-//    public static class ProductsMap extends LinkedHashMap<Integer, MageMeetsProduct> {}
-//    public static class ProductsArray extends ArrayList<MageMeetsProduct> {}
-//    public static class Categories extends ArrayList<MageMeetsCategory> {}
-//    public static class Customers extends ArrayList<MageMeetsCustomer> {}
-//    public static class ShippingMethods extends ArrayList<MageMeetsCartShipping> {}
-//    public static class PaymentMethods extends ArrayList<MageMeetsCartPayment> {}
-//    public static class CartItems extends ArrayList<MageMeetsCartItem> {}
-//    public static class StockInfos extends ArrayList<MageStockItem> {}
-//    public static class Addresses extends ArrayList<MageMeetsAddress> {}
-
-
-    public Class productsMap();
-    public Class productsList();
-    public Class categoriesList();
-    public Class customersList();
-    public Class shippingMethodsList();
-    public Class paymentMethodsList();
-    public Class cartItemList();
-    public Class stockInfosList();
-    public Class addressesList();
+    public Class<? extends Map> productsMap();
+    public Class<? extends List> productsList();
+    public Class<? extends List> categoriesList();
+    public Class<? extends List> customersList();
+    public Class<? extends List> shippingMethodsList();
+    public Class<? extends List> paymentMethodsList();
+    public Class<? extends List> cartItemsList();
+    public Class<? extends List> stockInfosList();
+    public Class<? extends List> addressesList();
 }
