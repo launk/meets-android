@@ -22,9 +22,6 @@ public class MageMeetsCartPayment extends Serializable.Object implements MeetsCa
     @Key private String cc_type;
     @Key private String cc_exp_year;
     @Key private String cc_exp_month;
-    @Key
-    @Serializable.PropertyName("paymill-payment-token-cc")
-    private String paymill_payment_token_cc;
 
     @Override
     public String getTitle() {
@@ -84,9 +81,4 @@ public class MageMeetsCartPayment extends Serializable.Object implements MeetsCa
         return this;
     }
 
-    @Override
-    public MeetsCart.Payment setPaymillToken(String token) {
-        paymill_payment_token_cc = token;
-        return this;
-    }
 }

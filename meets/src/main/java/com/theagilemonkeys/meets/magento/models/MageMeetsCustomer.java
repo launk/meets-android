@@ -23,6 +23,7 @@ import org.jdeferred.DonePipe;
 import org.jdeferred.Promise;
 import org.jdeferred.impl.DeferredObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
     @Key private int website_id;
     @Key private String password;
     @Key private String password_hash;
-    @Key private MageApiMethodCollectionResponseClasses.Addresses addresses;
+    @Key private List<MeetsAddress> addresses;
 
     {
         store_id = Meets.storeId;
@@ -57,7 +58,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
     }
 
     //This is specific of magento
-    public MeetsCustomer setMode(String mode){
+    public MeetsCustomer setMode(String mode) {
         this.mode = mode;
         return this;
     }
@@ -139,12 +140,8 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
     }
 
     @Override
-    public List getAddresses() {
-        //TODO Remove the pojos and use the new form of getting the type of generic class in parsers
-//        List<MeetsAddress> res = new ArrayList<MeetsAddress>();
-//        if (addresses != null) res.addAll(addresses);
-//        return res;
-        return addresses;
+    public List<MeetsAddress> getAddresses() {
+        return addresses == null? new ArrayList<MeetsAddress>() : addresses;
     }
 
     private MeetsCustomer create() {
@@ -270,7 +267,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                 .done(new DoneCallback() {
                     @Override
                     public void onDone(Object o) {
-                        addresses = (MageApiMethodCollectionResponseClasses.Addresses) o;
+                        addresses = (List<MeetsAddress>) o;
                     }
                 })
                 .always(onlyTrigger);
@@ -296,7 +293,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                     public void onDone(Object o) {
                         MeetsAddress resultAddress = (MeetsAddress) o;
                         meetsAddress.setId(resultAddress.getId());
-                        if (addresses == null) addresses = new MageApiMethodCollectionResponseClasses.Addresses();
+                        if (addresses == null) addresses = new ArrayList<MeetsAddress>();
 
                         // Update the default billing and shipping state in the other addresses
                         for (MeetsAddress address : addresses) {

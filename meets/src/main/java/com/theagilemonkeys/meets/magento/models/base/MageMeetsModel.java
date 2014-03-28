@@ -4,8 +4,8 @@ import com.theagilemonkeys.meets.ApiMethod;
 import com.theagilemonkeys.meets.ApiMethodModelHelper;
 import com.theagilemonkeys.meets.models.base.MeetsListener;
 import com.theagilemonkeys.meets.models.base.MeetsModel;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
 import com.theagilemonkeys.meets.utils.Copier;
+import com.theagilemonkeys.meets.utils.soap.Serializable;
 
 import org.jdeferred.AlwaysCallback;
 import org.jdeferred.Deferred;

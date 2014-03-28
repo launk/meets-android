@@ -75,7 +75,6 @@ public interface MeetsCart extends MeetsModel<MeetsCart> {
         Payment setCcType(String ccType);
         Payment setCcExpYear(String ccExpYear);
         Payment setCcExpMonth(String ccExpMonth);
-        Payment setPaymillToken(String token);
     }
 
     interface Shipping extends Serializable {

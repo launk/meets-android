@@ -22,8 +22,11 @@ android {
 dependencies {
     compile('com.octo.android.robospice:robospice:1.4.9')
     compile('com.octo.android.robospice:robospice-google-http-client:1.4.9')
-    compile 'com.google.api-client:google-api-client-jackson2:1.17.0-rc'
+    compile 'com.google.api-client:google-api-client-jackson2:1.18.0-rc'
     compile 'org.jdeferred:jdeferred-core:1.1.0'
+
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.3.2'
+//    compile 'com.fasterxml.jackson.core:jackson-annotations:2.2.0'
 
     compile fileTree(dir: 'libs', include: '*.jar')
 }

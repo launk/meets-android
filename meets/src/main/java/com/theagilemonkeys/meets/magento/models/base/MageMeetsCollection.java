@@ -25,11 +25,16 @@ import java.util.Map;
  */
 public class MageMeetsCollection<MODEL extends MeetsModel> extends ArrayList<MODEL> implements MeetsCollection<MODEL> {
     private transient ApiMethodModelHelper<MeetsCollection<MODEL>> apiMethodCtrl = new ApiMethodModelHelper<MeetsCollection<MODEL>>(this);
-    private Class<? extends ApiMethod> fetchApiMethodClass;
+    private transient Class<? extends ApiMethod> fetchApiMethodClass;
     protected int page = 1;
     protected int pageSize = 20;
     protected boolean resetOnFetch = false;
     protected Map<String, Object> filters = new HashMap<String, Object>();
+
+    /**
+     * This default constructor is only for serialization purposes. Should not be used directly
+     */
+    public MageMeetsCollection(){}
 
     public MageMeetsCollection(Class<? extends ApiMethod> fetchApiMethodClass) {
         this.fetchApiMethodClass = fetchApiMethodClass;
