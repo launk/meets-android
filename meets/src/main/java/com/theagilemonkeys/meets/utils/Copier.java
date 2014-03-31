@@ -1,10 +1,11 @@
 package com.theagilemonkeys.meets.utils;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.theagilemonkeys.meets.utils.Reflections.getAllFields;
 
 /**
  * Android Meets SDK
@@ -50,7 +51,7 @@ public class Copier {
      * @throws IllegalAccessException
      */
     public Copier copyProperties(Object dst, Object src) {
-        List<Field> dstFields = Arrays.asList(dst.getClass().getDeclaredFields());
+        List<Field> dstFields = getAllFields(dst.getClass());
 
         try{
             for(Field field : src.getClass().getDeclaredFields()){

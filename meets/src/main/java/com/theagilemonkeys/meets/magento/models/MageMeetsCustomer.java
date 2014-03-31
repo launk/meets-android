@@ -20,7 +20,7 @@ import com.theagilemonkeys.meets.utils.soap.Serializable;
 import org.jdeferred.Deferred;
 import org.jdeferred.DoneCallback;
 import org.jdeferred.DonePipe;
-import org.jdeferred.Promise;
+import org.jdeferred.FailCallback;
 import org.jdeferred.impl.DeferredObject;
 
 import java.util.ArrayList;
@@ -74,7 +74,9 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
             }
         };
 
-        pushMethod(new CustomerCustomerInfo(), params).always(updateAndTrigger);
+        pushMethod(new CustomerCustomerInfo(), params)
+                .done(updateFromResult)
+                .always(triggerListeners);
         return this;
     }
 
@@ -155,7 +157,9 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
         };
 
         forceNextCacheToBe(false);
-        pushMethod(new CustomerCustomerCreate(), params).always(updateAndTrigger);
+        pushMethod(new CustomerCustomerCreate(), params)
+                .done(updateFromResult)
+                .always(triggerListeners);
         return this;
     }
 
@@ -175,7 +179,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
         };
 
         forceNextCacheToBe(false);
-        pushMethod(new CustomerCustomerUpdate(), params).always(onlyTrigger);
+        pushMethod(new CustomerCustomerUpdate(), params).always(triggerListeners);
         return this;
     }
 
@@ -226,13 +230,14 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                 else{
                     MeetsCustomer customer = customers.get(0);
                     if (password == null || internalCheckPassword(password, customer.getPasswordHash())) {
-                        updateAndTrigger.onAlways(Promise.State.RESOLVED, customer, null);
+                        updateFromFetchedResult(customer);
+                        triggerListeners();
                         return new DeferredObject().resolve(MageMeetsCustomer.this);
                     }
                     e = new Exception("Incorrect password");
                 }
 
-                updateAndTrigger.onAlways(Promise.State.REJECTED, null, e);
+                triggerListeners(e);
                 return new DeferredObject().reject(e);
             }
         }, null);
@@ -267,15 +272,21 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                 .done(new DoneCallback() {
                     @Override
                     public void onDone(Object o) {
-                        addresses = (List<MeetsAddress>) o;
+                        addresses = (List) o;
                     }
                 })
-                .always(onlyTrigger);
+                .always(triggerListeners);
         return this;
     }
 
     @Override
-    public MeetsCustomer addAddress(final MeetsAddress meetsAddress) {
+    public MeetsCustomer saveAddress(final MeetsAddress meetsAddress) {
+        if( ! meetsAddress.isNew() ) {
+            ((MageMeetsAddress) meetsAddress).save();
+            refreshAddressesAfterSave(meetsAddress);
+            return this;
+        }
+
         ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
             @Override
             public Map<String, Object> buildParams() {
@@ -291,59 +302,62 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                 .done(new DoneCallback() {
                     @Override
                     public void onDone(Object o) {
-                        MeetsAddress resultAddress = (MeetsAddress) o;
-                        meetsAddress.setId(resultAddress.getId());
-                        if (addresses == null) addresses = new ArrayList<MeetsAddress>();
-
-                        // Update the default billing and shipping state in the other addresses
-                        for (MeetsAddress address : addresses) {
-                            if (meetsAddress.isDefaultBilling() && address.isDefaultBilling())
-                                address.setDefaultBilling(false);
-                            if (meetsAddress.isDefaultShipping() && address.isDefaultShipping())
-                                address.setDefaultShipping(false);
-                        }
-
-                        addresses.add((MageMeetsAddress) meetsAddress);
+                        meetsAddress.setId(((MeetsAddress)o).getId());
+                        refreshAddressesAfterSave(meetsAddress);
+                        addresses.add(meetsAddress);
                     }
                 })
-                .always(onlyTrigger);
+                .always(triggerListeners);
         return this;
-    }
-
-    @Override
-    public MeetsCustomer saveAddress(MeetsAddress meetsAddress) {
-        return null; //TODO
     }
 
     @Override
     public MeetsCustomer removeAddress(final int addressId) {
-        //TODO: Remove the address locally before the request (as with cart items) to avoid remove addresses not present in the customer
-        ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
-            @Override
-            public Map<String, Object> buildParams() {
-                Map<String, Object> params = new HashMap<String, Object>();
-                params.put("addressId", addressId);
-                return params;
+        int indexToRemove = -1;
+        for(int i = 0; i < addresses.size(); ++i) {
+            if (addresses.get(i).getId() == addressId) {
+                indexToRemove = i;
+                break;
             }
-        };
+        }
+        if (indexToRemove >= 0) {
+            final MeetsAddress addressToRemove = addresses.remove(indexToRemove);
+            final int finalIndexToRemove = indexToRemove;
 
-        forceNextCacheToBe(false);
-        pushMethod(new CustomerAddressDelete(), params)
-                .done(new DoneCallback() {
-                    @Override
-                    public void onDone(Object o) {
-                        for(int i = 0; i < addresses.size(); ++i)
-                        {
-                            MeetsAddress address = addresses.get(i);
-                            if (address.getId() == addressId){
-                                addresses.remove(i);
-                                return;
-                            }
+            ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
+                @Override
+                public Map<String, Object> buildParams() {
+                    Map<String, Object> params = new HashMap<String, Object>();
+                    params.put("addressId", addressId);
+                    return params;
+                }
+            };
+
+            forceNextCacheToBe(false);
+            pushMethod(new CustomerAddressDelete(), params)
+                    .fail(new FailCallback() {
+                        @Override
+                        public void onFail(Object result) {
+                            addresses.add(finalIndexToRemove, addressToRemove);
                         }
-                    }
-                })
-                .always(onlyTrigger);
+                    })
+                    .always(triggerListeners);
+        }
         return this;
+    }
+
+    private void refreshAddressesAfterSave(MeetsAddress savedAddress) {
+        for (MeetsAddress address : addresses) {
+            if (address.getId() == savedAddress.getId()) {
+                address.shallowCopyFrom(savedAddress);
+            }
+            else {
+                if (savedAddress.isDefaultBilling() && address.isDefaultBilling())
+                    address.setDefaultBilling(false);
+                if (savedAddress.isDefaultShipping() && address.isDefaultShipping())
+                    address.setDefaultShipping(false);
+            }
+        }
     }
 
     @Override

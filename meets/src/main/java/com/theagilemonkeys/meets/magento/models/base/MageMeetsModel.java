@@ -9,6 +9,7 @@ import com.theagilemonkeys.meets.utils.soap.Serializable;
 
 import org.jdeferred.AlwaysCallback;
 import org.jdeferred.Deferred;
+import org.jdeferred.DoneCallback;
 import org.jdeferred.DonePipe;
 import org.jdeferred.FailPipe;
 import org.jdeferred.Promise;
@@ -43,18 +44,17 @@ public abstract class MageMeetsModel<MODEL extends MeetsModel> extends Serializa
         getCopier().copyProperties(this, fetchedResult);
     }
 
-    protected transient AlwaysCallback updateAndTrigger = new AlwaysCallback() {
+    protected transient AlwaysCallback triggerListeners = new AlwaysCallback() {
         @Override
         public void onAlways(Promise.State state, Object resolved, Object rejected) {
-            if (state == Promise.State.RESOLVED) updateFromFetchedResult(resolved);
             triggerListeners((Exception) rejected);
         }
     };
 
-    protected transient AlwaysCallback onlyTrigger = new AlwaysCallback() {
+    protected transient DoneCallback updateFromResult = new DoneCallback() {
         @Override
-        public void onAlways(Promise.State state, Object resolved, Object rejected) {
-            triggerListeners((Exception) rejected);
+        public void onDone(Object result) {
+            updateFromFetchedResult(result);
         }
     };
 
@@ -66,7 +66,8 @@ public abstract class MageMeetsModel<MODEL extends MeetsModel> extends Serializa
      * @return Copier
      */
     protected Copier getCopier(){
-        return new Copier().setIgnoreNulls(true);
+        return new Copier().setIgnoreNulls(true)
+                           .ignoreInstancesOf(ApiMethodModelHelper.class);
     }
 
     @Override

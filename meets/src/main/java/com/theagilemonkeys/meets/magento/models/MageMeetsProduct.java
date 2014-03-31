@@ -46,7 +46,9 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
             }
         };
 
-        pushMethod(new Products(), params).always(updateAndTrigger);
+        pushMethod(new Products(), params)
+                .done(updateFromResult)
+                .always(triggerListeners);
         return this;
     }
 
@@ -162,7 +164,7 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
                 }
             }
         })
-        .always(onlyTrigger);
+        .always(triggerListeners);
 
         return this;
     }

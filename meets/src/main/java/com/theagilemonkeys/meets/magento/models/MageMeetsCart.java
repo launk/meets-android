@@ -1,7 +1,10 @@
 package com.theagilemonkeys.meets.magento.models;
 
+import android.util.Log;
+
 import com.google.api.client.util.Key;
 import com.theagilemonkeys.meets.ApiMethodModelHelper;
+import com.theagilemonkeys.meets.magento.MageApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.magento.methods.ShoppingCartCreate;
 import com.theagilemonkeys.meets.magento.methods.ShoppingCartCustomerAddresses;
 import com.theagilemonkeys.meets.magento.methods.ShoppingCartCustomerSet;
@@ -13,7 +16,6 @@ import com.theagilemonkeys.meets.magento.methods.ShoppingCartProductAdd;
 import com.theagilemonkeys.meets.magento.methods.ShoppingCartProductRemove;
 import com.theagilemonkeys.meets.magento.methods.ShoppingCartShippingList;
 import com.theagilemonkeys.meets.magento.methods.ShoppingCartShippingMethod;
-import com.theagilemonkeys.meets.magento.MageApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsAddress;
 import com.theagilemonkeys.meets.models.MeetsCart;
@@ -23,6 +25,7 @@ import com.theagilemonkeys.meets.models.base.MeetsFactory;
 import com.theagilemonkeys.meets.utils.soap.Serializable;
 import com.theagilemonkeys.meets.utils.soap.SoapParser;
 
+import org.jdeferred.AlwaysCallback;
 import org.jdeferred.DoneCallback;
 import org.jdeferred.FailCallback;
 import org.jdeferred.Promise;
@@ -51,7 +54,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
     @Key private double grand_total = 0;
     @Key
     @SoapParser.ListType(MageApiMethodCollectionResponseClasses.CartItems.class)
-    private List<Item> items = new ArrayList<Item>();
+    private List<Item> items;
 
     private List<Shipping> shippingMethods;
     private List<Payment> paymentMethods;
@@ -74,7 +77,9 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
             }
         };
 
-        pushMethod(new ShoppingCartInfo(), params).always(updateAndTrigger);
+        pushMethod(new ShoppingCartInfo(), params)
+                .done(updateFromResult)
+                .always(triggerListeners);
         return this;
     }
 
@@ -91,7 +96,21 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
 
     @Override
     public MeetsCart create() {
-        pushMethod(new ShoppingCartCreate()).always(updateAndTrigger);
+        pushMethod(new ShoppingCartCreate())
+                .done(updateFromResult)
+                .done(new DoneCallback() {
+                    @Override
+                    public void onDone(Object result) {
+                        Log.d("HEY", "---------> Cart was created, id: " + getId());
+                    }
+                })
+                .always(new AlwaysCallback() {
+                    @Override
+                    public void onAlways(Promise.State state, Object resolved, Object rejected) {
+                        Log.d("HEY", "---------> Cart was updated, id: " + getId());
+                    }
+                })
+                .always(triggerListeners);
         nextWaitForPrevious();
         return this;
     }
@@ -119,7 +138,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
             }
         };
 
-        pushMethod(new ShoppingCartCustomerSet(), params).always(onlyTrigger);
+        pushMethod(new ShoppingCartCustomerSet(), params).always(triggerListeners);
         return this;
     }
 
@@ -142,7 +161,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
             }
         };
 
-        pushMethod(new ShoppingCartCustomerAddresses(), params).always(onlyTrigger);
+        pushMethod(new ShoppingCartCustomerAddresses(), params).always(triggerListeners);
         return this;
     }
 
@@ -158,7 +177,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
             }
         };
 
-        pushMethod(new ShoppingCartShippingMethod(), params).always(onlyTrigger);
+        pushMethod(new ShoppingCartShippingMethod(), params).always(triggerListeners);
         return this;
     }
 
@@ -174,7 +193,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
             }
         };
 
-        pushMethod(new ShoppingCartPaymentMethod(), params).always(onlyTrigger);
+        pushMethod(new ShoppingCartPaymentMethod(), params).always(triggerListeners);
         return this;
     }
 
@@ -196,7 +215,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                         lastOrderId = (String) result;
                     }
                 })
-                .always(onlyTrigger);
+                .always(triggerListeners);
         return this;
     }
 
@@ -236,6 +255,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                 // Create the params and call the method
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("quoteId", quote_id);
+                Log.d("HEY", "------------> Quote_id: " + quote_id);
                 params.put("products", cartItemsToSend);
                 return params;
             }
@@ -246,9 +266,10 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                     @Override
                     public void onFail(Object result) {
                         localRemoveItems(items);
+                        Log.d("HEY", "------------> Falló al añadir producto. Quote_id: " + quote_id);
                     }
                 })
-                .always(onlyTrigger);
+                .always(triggerListeners);
         return null;
     }
 
@@ -257,6 +278,8 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
     }
 
     private void localAddItem(Item item) {
+        if (items == null)
+            items = new ArrayList<Item>();
         // Update the local data of cart products
         Item localCartItem = null;
         double qty = item.getQuantity();
@@ -338,10 +361,10 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                             localAddItems(removedItems);
                         }
                     })
-                    .always(onlyTrigger);
+                    .always(triggerListeners);
         }
         else {
-            onlyTrigger.onAlways(Promise.State.RESOLVED, this, null);
+            triggerListeners.onAlways(Promise.State.RESOLVED, this, null);
         }
         return this;
     }
@@ -356,6 +379,9 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
     }
 
     private Item localRemoveItem(Item itemToRemove) {
+        if(items == null)
+            return null;
+
         Item localCartItem = null;
 
         for(Item item : items){
@@ -434,7 +460,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                         shippingMethods = (List<Shipping>) result;
                     }
                 })
-                .always(onlyTrigger);
+                .always(triggerListeners);
         return this;
     }
 
@@ -457,7 +483,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                         paymentMethods = (List<Payment>) result;
                     }
                 })
-                .always(onlyTrigger);
+                .always(triggerListeners);
         return this;
     }
 }

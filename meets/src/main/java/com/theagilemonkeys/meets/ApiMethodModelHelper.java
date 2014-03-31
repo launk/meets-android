@@ -43,8 +43,9 @@ public class ApiMethodModelHelper<MODEL> implements ApiMethodModelHelperInterfac
     public Promise pushMethod(final ApiMethod method, final DelayedParams params) {
         // With this clear all references to previous onDone, onFail and onAlways callbacks, avoiding possible
         // memory leaks
-        if (! masterPromise.isPending())
+        if (! masterPromise.isPending()) {
             masterPromise = new DeferredObject().resolve(model);
+        }
 
         if ( ! modelCacheEnable ) {
             method.setCacheDuration(DurationInMillis.ALWAYS_EXPIRED);
@@ -56,15 +57,21 @@ public class ApiMethodModelHelper<MODEL> implements ApiMethodModelHelperInterfac
         }
 
         if ( serially ){
-            serially = false;
+            // This is not the best way to implement the "nextWaitForPrevious" functionality.
+            // All the operations called between the call to "nextWaitForPrevious" and the result
+            // of the first operation will be executed serially.
+            // The correct behaviour should be that all of them were executed in parallel after
+            // the finish of the first one
             return pushPipe(new DonePipe() {
                                 @Override
                                 public Deferred pipeDone(Object result) {
+                                    serially = false;
                                     return method.run(params.buildParams(), params.buildUrlExtraSegments());
                                 }
                             }, new FailPipe() {
                                 @Override
                                 public Deferred pipeFail(Object o) {
+                                    serially = false;
                                     return new DeferredObject().reject(o);
                                 }
                             });

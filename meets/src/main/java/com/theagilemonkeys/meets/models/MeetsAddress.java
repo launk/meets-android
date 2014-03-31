@@ -35,8 +35,4 @@ public interface MeetsAddress extends MeetsModel<MeetsAddress> {
     MeetsAddress setFax(String fax);
     MeetsAddress setDefaultBilling(boolean defaultBilling);
     MeetsAddress setDefaultShipping(boolean defaultShipping);
-
-    // TODO: Quitar. Se usan los de customer
-    MeetsAddress save();
-    MeetsAddress remove();
 }

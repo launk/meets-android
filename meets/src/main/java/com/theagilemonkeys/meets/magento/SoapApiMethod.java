@@ -29,9 +29,9 @@ import java.util.Map;
  * @author Álvaro López Espinosa
  */
 public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
-    private static final String HTTPS_PREFIX = "https://";
+    private static final String TAG = "----> SoapApiMethod";
     private static String apiSessionId;
-    private static final Object sessionIdLock = new Object();
+    private static final Object lock = new Object();
 
     public static final String API_SESSION_EXPIRED_FAULTCODE = "5";
 
@@ -41,20 +41,13 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
     public static String soapApiPass;
     public static String soapNamespace;
 
-    private SoapSerializationEnvelope soapEnvelope;
-    private HttpTransportSE httpTransport;
+    public static int timeout = 1 * 60 * 1000; // 1 minute timeout
 
     public SoapApiMethod(Class magentoModelClass) {
         super(magentoModelClass);
     }
     @Override
     public Deferred run(Map<String, Object> params, List<String> urlExtraSegments) {
-        httpTransport = new HttpTransportSE(baseUrl);
-        soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-        soapEnvelope.implicitTypes = true;
-        soapEnvelope.dotNet = false;
-        soapEnvelope.xsd = SoapSerializationEnvelope.XSD;
-        soapEnvelope.enc = SoapSerializationEnvelope.ENC;
         return super.run(params, urlExtraSegments);
     }
 
@@ -69,36 +62,44 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
 
     @Override
     public RESULT loadDataFromNetwork() throws Exception {
-        ensureApiLogin();
+//            Log.d(TAG, "Entra hilo " + Thread.currentThread().getId() + ". Lock id: " + lock);
+            ensureApiLogin();
 
-        Object res = send(getMethodName(), params);
+            Object res = send(getMethodName(), params);
 
-        if ( SoapParser.isPrimitiveOrInmutable(responseClass) ){
-            return (RESULT) res;
-        }
-        else{
-            RESULT model = (RESULT) responseClass.newInstance();
-            parseResponse(res, model);
-            return model;
-        }
+            if (SoapParser.isPrimitiveOrInmutable(responseClass)) {
+//                Log.d(TAG, "Sale hilo " + Thread.currentThread().getId() + ". Lock id: " + lock);
+                return (RESULT) res;
+            } else {
+                RESULT model = (RESULT) responseClass.newInstance();
+                parseResponse(res, model);
+//                Log.d(TAG, "Sale hilo " + Thread.currentThread().getId() + ". Lock id: " + lock);
+                return model;
+            }
     }
 
     private Object send(String method, Map<String, Object> params) throws IOException, XmlPullParserException {
+        HttpTransportSE httpTransport = new HttpTransportSE(baseUrl,timeout);
+        SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        soapEnvelope.implicitTypes = true;
+        soapEnvelope.dotNet = false;
+        soapEnvelope.xsd = SoapSerializationEnvelope.XSD;
+        soapEnvelope.enc = SoapSerializationEnvelope.ENC;
+
         SoapObject request = new SoapObject(soapNamespace, method);
 
-        if ( params == null)
+        if (params == null)
             params = new HashMap<String, Object>();
 
         if (apiSessionIsValid())
             params.put("sessionId", getApiSessionId());
 
-        for (Map.Entry<String,Object> entry : params.entrySet()){
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
             String key = entry.getKey();
             Object val = entry.getValue();
-            if ( val instanceof KvmSerializable ){
+            if (val instanceof KvmSerializable) {
                 request.addProperty(buildPropertyInfo(key, (KvmSerializable) val));
-            }
-            else{
+            } else {
                 request.addProperty(key, val);
             }
         }
@@ -112,16 +113,13 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
             byte[] token = (basicAuthName + ":" + basicAuthPass).getBytes();
             headerList.add(new HeaderProperty("Authorization", "Basic " + org.kobjects.base64.Base64.encode(token)));
         }
-        // This is due to a ksoap error. Sometimes we need to close connection and restart.
-        headerList.add(new HeaderProperty("Connection", "Close"));
-
-
-        httpTransport.call("", soapEnvelope, headerList);
 
         try {
+            synchronized (lock) {
+                httpTransport.call("", soapEnvelope, headerList);
+            }
             return soapEnvelope.getResponse();
-        }
-        catch (SoapFault e) {
+        } catch (SoapFault e) {
             if (API_SESSION_EXPIRED_FAULTCODE.equals(e.faultcode)) {
                 // Session expired. Set apiSessionId to null and let it reconnect on retry
                 setApiSessionId(null);
@@ -150,7 +148,7 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
     }
 
     private void ensureApiLogin() throws IOException, XmlPullParserException {
-        synchronized (sessionIdLock) {
+        synchronized (lock) {
             if ( getApiSessionId() == null )
                 setApiSessionId((String) send("login", "username", soapApiUser, "apiKey", soapApiPass));
         }
@@ -158,20 +156,20 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
     }
 
     private static void setApiSessionId(String id) {
-        synchronized (sessionIdLock) {
+        synchronized (lock) {
             apiSessionId = id;
         }
     }
 
     private static String getApiSessionId() {
-        synchronized (sessionIdLock) {
+        synchronized (lock) {
             return apiSessionId;
         }
     }
 
 
     private static boolean apiSessionIsValid(){
-        synchronized (sessionIdLock) {
+        synchronized (lock) {
             return apiSessionId != null;
         }
     }

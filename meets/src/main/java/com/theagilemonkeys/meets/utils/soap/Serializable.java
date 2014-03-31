@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 
+import static com.theagilemonkeys.meets.utils.Reflections.getAllFields;
+
 /**
  * Android Meets SDK
  * Original work Copyright (c) 2014 [TheAgileMonkeys]
@@ -38,7 +40,7 @@ public class Serializable {
 
             fields = new ArrayList<Field>();
 
-            for(Field field : getClass().getDeclaredFields() ){
+            for(Field field : getAllFields(getClass()) ){
                 Key keyAnnotation = field.getAnnotation(Key.class);
                 if ( keyAnnotation != null ) fields.add(field);
             }

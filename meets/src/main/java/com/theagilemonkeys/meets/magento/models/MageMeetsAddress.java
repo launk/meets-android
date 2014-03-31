@@ -62,7 +62,9 @@ public class MageMeetsAddress extends MageMeetsModel<MeetsAddress> implements Me
         };
 
 
-        pushMethod(new CustomerAddressInfo(), params).always(updateAndTrigger);
+        pushMethod(new CustomerAddressInfo(), params)
+                .done(updateFromResult)
+                .always(triggerListeners);
         return this;
     }
 
@@ -75,7 +77,13 @@ public class MageMeetsAddress extends MageMeetsModel<MeetsAddress> implements Me
 
     @Override
     public int getId() {
-        return customer_address_id > 0 ? customer_address_id : Integer.parseInt(address_id);
+        if(customer_address_id != null) {
+            return customer_address_id;
+        }
+        if(address_id != null){
+            Integer.parseInt(address_id);
+        }
+        return 0;
     }
 
     @Override
@@ -158,8 +166,7 @@ public class MageMeetsAddress extends MageMeetsModel<MeetsAddress> implements Me
         return this;
     }
 
-    @Override
-    public MeetsAddress save() {
+    MeetsAddress save() {
         ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
             @Override
             public Map<String, Object> buildParams() {
@@ -171,12 +178,11 @@ public class MageMeetsAddress extends MageMeetsModel<MeetsAddress> implements Me
         };
 
         forceNextCacheToBe(false);
-        pushMethod(new CustomerAddressUpdate(), params).always(onlyTrigger);
+        pushMethod(new CustomerAddressUpdate(), params).always(triggerListeners);
         return this;
     }
 
-    @Override
-    public MeetsAddress remove() {
+    MeetsAddress remove() {
         ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
             @Override
             public Map<String, Object> buildParams() {
@@ -187,7 +193,7 @@ public class MageMeetsAddress extends MageMeetsModel<MeetsAddress> implements Me
         };
 
         forceNextCacheToBe(false);
-        pushMethod(new CustomerAddressDelete(), params).always(onlyTrigger);
+        pushMethod(new CustomerAddressDelete(), params).always(triggerListeners);
         return this;
     }
 

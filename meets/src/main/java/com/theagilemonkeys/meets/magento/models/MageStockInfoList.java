@@ -1,7 +1,6 @@
 package com.theagilemonkeys.meets.magento.models;
 
 import com.theagilemonkeys.meets.ApiMethodModelHelper;
-import com.theagilemonkeys.meets.magento.MageApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.magento.methods.CatalogInventoryStockItemList;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsStock;
@@ -20,7 +19,7 @@ import java.util.Map;
  */
 public class MageStockInfoList extends MageMeetsModel<MeetsStock.ItemList> implements MeetsStock.ItemList {
     private Serializable.List<Integer> idsList = new Serializable.List<Integer>();
-    private MageApiMethodCollectionResponseClasses.StockInfos stockInfoList;
+    private List<MeetsStock.Item> stockInfoList;
 
 
     @Override
@@ -40,7 +39,9 @@ public class MageStockInfoList extends MageMeetsModel<MeetsStock.ItemList> imple
                 return params;
             }
         };
-        pushMethod(new CatalogInventoryStockItemList(), params).always(updateAndTrigger);
+        pushMethod(new CatalogInventoryStockItemList(), params)
+                .done(updateFromResult)
+                .always(triggerListeners);
         return this;
     }
 
@@ -75,6 +76,6 @@ public class MageStockInfoList extends MageMeetsModel<MeetsStock.ItemList> imple
 
     @Override
     protected void updateFromFetchedResult(Object fetchedResult) {
-        stockInfoList = (MageApiMethodCollectionResponseClasses.StockInfos) fetchedResult;
+        stockInfoList = (List<MeetsStock.Item>) fetchedResult;
     }
 }

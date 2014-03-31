@@ -111,7 +111,7 @@ public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements
                         relatedProduct = (MeetsProduct) result;
                     }
                 })
-                .always(onlyTrigger);
+                .always(triggerListeners);
         return this;
     }
 

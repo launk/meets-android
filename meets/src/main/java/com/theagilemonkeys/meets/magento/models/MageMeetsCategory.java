@@ -49,7 +49,9 @@ public class MageMeetsCategory extends MageMeetsModel<MeetsCategory> implements 
                 return params;
             }
         };
-        pushMethod(new CatalogCategoryInfo(), params).always(updateAndTrigger);
+        pushMethod(new CatalogCategoryInfo(), params)
+                .done(updateFromResult)
+                .always(triggerListeners);
         return this;
     }
 
@@ -70,7 +72,7 @@ public class MageMeetsCategory extends MageMeetsModel<MeetsCategory> implements 
                         children = (MageApiMethodCollectionResponseClasses.Categories) result;
                     }
                 })
-                .always(onlyTrigger);
+                .always(triggerListeners);
         return this;
     }
 
@@ -84,7 +86,9 @@ public class MageMeetsCategory extends MageMeetsModel<MeetsCategory> implements 
                 return params;
             }
         };
-        pushMethod(new CatalogCategoryTree(), params).always(updateAndTrigger);
+        pushMethod(new CatalogCategoryTree(), params)
+                .done(updateFromResult)
+                .always(triggerListeners);
         return this;
     }
 

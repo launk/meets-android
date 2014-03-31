@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.theagilemonkeys.meets.utils.Reflections.getAllFields;
+
 /**
  * Android Meets SDK
  * Original work Copyright (c) 2014 [TheAgileMonkeys]
@@ -149,7 +151,7 @@ public class SoapParser {
 
     private static void parseObject(SoapObject in, Object out) throws IllegalAccessException, InstantiationException {
 
-        for(Field field : out.getClass().getDeclaredFields()){
+        for(Field field : getAllFields(out.getClass())){
             field.setAccessible(true);
             String fieldName = field.getName();
 
