@@ -1,7 +1,5 @@
 package com.theagilemonkeys.meets.magento.models;
 
-import android.util.Log;
-
 import com.google.api.client.util.Key;
 import com.theagilemonkeys.meets.ApiMethodModelHelper;
 import com.theagilemonkeys.meets.magento.MageApiMethodCollectionResponseClasses;
@@ -25,7 +23,6 @@ import com.theagilemonkeys.meets.models.base.MeetsFactory;
 import com.theagilemonkeys.meets.utils.soap.Serializable;
 import com.theagilemonkeys.meets.utils.soap.SoapParser;
 
-import org.jdeferred.AlwaysCallback;
 import org.jdeferred.DoneCallback;
 import org.jdeferred.FailCallback;
 import org.jdeferred.Promise;
@@ -98,18 +95,6 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
     public MeetsCart create() {
         pushMethod(new ShoppingCartCreate())
                 .done(updateFromResult)
-                .done(new DoneCallback() {
-                    @Override
-                    public void onDone(Object result) {
-                        Log.d("HEY", "---------> Cart was created, id: " + getId());
-                    }
-                })
-                .always(new AlwaysCallback() {
-                    @Override
-                    public void onAlways(Promise.State state, Object resolved, Object rejected) {
-                        Log.d("HEY", "---------> Cart was updated, id: " + getId());
-                    }
-                })
                 .always(triggerListeners);
         nextWaitForPrevious();
         return this;
@@ -255,7 +240,6 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                 // Create the params and call the method
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("quoteId", quote_id);
-                Log.d("HEY", "------------> Quote_id: " + quote_id);
                 params.put("products", cartItemsToSend);
                 return params;
             }
@@ -266,7 +250,6 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                     @Override
                     public void onFail(Object result) {
                         localRemoveItems(items);
-                        Log.d("HEY", "------------> Falló al añadir producto. Quote_id: " + quote_id);
                     }
                 })
                 .always(triggerListeners);

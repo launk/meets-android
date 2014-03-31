@@ -62,20 +62,17 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
 
     @Override
     public RESULT loadDataFromNetwork() throws Exception {
-//            Log.d(TAG, "Entra hilo " + Thread.currentThread().getId() + ". Lock id: " + lock);
-            ensureApiLogin();
+        ensureApiLogin();
 
-            Object res = send(getMethodName(), params);
+        Object res = send(getMethodName(), params);
 
-            if (SoapParser.isPrimitiveOrInmutable(responseClass)) {
-//                Log.d(TAG, "Sale hilo " + Thread.currentThread().getId() + ". Lock id: " + lock);
-                return (RESULT) res;
-            } else {
-                RESULT model = (RESULT) responseClass.newInstance();
-                parseResponse(res, model);
-//                Log.d(TAG, "Sale hilo " + Thread.currentThread().getId() + ". Lock id: " + lock);
-                return model;
-            }
+        if (SoapParser.isPrimitiveOrInmutable(responseClass)) {
+            return (RESULT) res;
+        } else {
+            RESULT model = (RESULT) responseClass.newInstance();
+            parseResponse(res, model);
+            return model;
+        }
     }
 
     private Object send(String method, Map<String, Object> params) throws IOException, XmlPullParserException {
