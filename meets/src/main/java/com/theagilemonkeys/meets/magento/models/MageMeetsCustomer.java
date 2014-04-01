@@ -230,7 +230,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                 else{
                     MeetsCustomer customer = customers.get(0);
                     if (password == null || internalCheckPassword(password, customer.getPasswordHash())) {
-                        updateFromFetchedResult(customer);
+                        updateFromResult(customer);
                         triggerListeners();
                         return new DeferredObject().resolve(MageMeetsCustomer.this);
                     }

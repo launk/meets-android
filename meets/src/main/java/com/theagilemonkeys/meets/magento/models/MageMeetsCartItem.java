@@ -32,6 +32,7 @@ public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements
     @Override
     public MeetsCart.Item fillFromProduct(MeetsProduct product) {
         product_id = String.valueOf(product.getId());
+        sku = product.getSku();
         name = product.getName();
         description = product.getDescription();
         price = product.getPrice();

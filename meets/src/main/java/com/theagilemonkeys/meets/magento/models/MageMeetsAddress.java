@@ -31,7 +31,6 @@ public class MageMeetsAddress extends MageMeetsModel<MeetsAddress> implements Me
     @Key private String lastname;
     @Key private String prefix;
     @Key private String suffix;
-    @Key private String email;
     @Key private String company;
     @Key private Object street; //Something really weird happens when use String as type field. The server does not recognizes  it
     @Key private String city;

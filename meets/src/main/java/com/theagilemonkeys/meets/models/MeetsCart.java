@@ -19,6 +19,11 @@ public interface MeetsCart extends MeetsModel<MeetsCart> {
     double getSubtotal();
     double getTotal();
     String getOrderId();
+    MeetsCustomer getAttachedCustomer();
+    MeetsAddress getAttachedBillingAddress();
+    MeetsAddress getAttachedShippingAddress();
+    Shipping getAttachedShippingMethod();
+    Payment getAttachedPaymentMethod();
 
     MeetsCart create();
 

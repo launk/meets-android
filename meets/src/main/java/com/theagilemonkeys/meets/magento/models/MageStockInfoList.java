@@ -75,7 +75,7 @@ public class MageStockInfoList extends MageMeetsModel<MeetsStock.ItemList> imple
     }
 
     @Override
-    protected void updateFromFetchedResult(Object fetchedResult) {
+    protected void updateFromResult(Object fetchedResult) {
         stockInfoList = (List<MeetsStock.Item>) fetchedResult;
     }
 }

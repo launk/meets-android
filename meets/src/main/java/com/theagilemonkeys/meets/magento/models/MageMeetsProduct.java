@@ -1,17 +1,19 @@
 package com.theagilemonkeys.meets.magento.models;
 
 import com.google.api.client.util.Key;
+import com.theagilemonkeys.meets.ApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.ApiMethodModelHelper;
+import com.theagilemonkeys.meets.magento.methods.CatalogProductInfo;
 import com.theagilemonkeys.meets.magento.methods.CatalogProductList;
 import com.theagilemonkeys.meets.magento.methods.Products;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsProduct;
-import com.theagilemonkeys.meets.ApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.utils.StringUtils;
 import com.theagilemonkeys.meets.utils.soap.Serializable;
 
 import org.jdeferred.DoneCallback;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +37,10 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     @Key private Double final_price_with_tax;
     @Key private String price;
     @Key private ApiMethodCollectionResponseClasses.ListOfGenericMaps additional_attributes;
+
+    private Map<String, String> parsedAdditionalAttributes;
     private List<MeetsProduct> associatedProducs;
+    private List<String> images;
 
     @Override
     public MeetsProduct fetch() {
@@ -96,8 +101,8 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     }
 
     @Override
-    public Map<String, String> getImages() {
-        throw new UnsupportedOperationException("Still not implemented");
+    public List<String> getImages() {
+        return images;
     }
 
     @Override
@@ -113,22 +118,63 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
 
     @Override
     public MeetsProduct fetchImages() {
-        return null;
+        ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
+            @Override
+            public List<String> buildUrlExtraSegments() {
+                return Arrays.asList(String.valueOf(getId()), "images");
+            }
+        };
+
+        pushMethod(new Products().setResponseClass(null), params)
+                .done(new DoneCallback() {
+                    @Override
+                    public void onDone(Object result) {
+                        images = new ArrayList<String>();
+                        for(Map<String, Object> imageData : (List<Map>)result) {
+                            images.add((String) imageData.get("url"));
+                        }
+                    }
+                })
+                .always(triggerListeners);
+        return this;
     }
 
     @Override
     public MeetsProduct fetchWithAdditionalAttributes(String... additionalAttributes) {
-        throw new UnsupportedOperationException("Still not implemented");
+        return fetchWithAdditionalAttributes(Arrays.asList(additionalAttributes));
     }
 
     @Override
     public MeetsProduct fetchWithAdditionalAttributes(final List<String> additionalAttributes) {
-        throw new UnsupportedOperationException("Still not implemented");
+        ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
+            @Override
+            public Map<String, Object> buildParams() {
+                Serializable.List serializableAdditionalAttrs = new Serializable.List(additionalAttributes);
+
+                Map<String, Object> attributes = new Serializable.Map<String, Object>();
+                attributes.put("additional_attributes", serializableAdditionalAttrs);
+
+                Map<String, Object> params = new HashMap<String, Object>();
+                params.put("product", getId());
+                params.put("attributes", attributes);
+                return params;
+            }
+        };
+
+        pushMethod(new CatalogProductInfo(), params)
+                .done(new DoneCallback() {
+                    @Override
+                    public void onDone(Object result) {
+//                        debería tener ya aquí los valores de los attributos
+                    }
+                })
+                .always(triggerListeners);
+        return this;
     }
 
     @Override
     public Map<String, String> getAdditionalAttributes() {
-        throw new UnsupportedOperationException("Still not implemented");
+        return parsedAdditionalAttributes;
     }
 
     @Override

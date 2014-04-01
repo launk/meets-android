@@ -66,8 +66,9 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
         this.responseClass = responseClass;
     }
 
-    public void setResponseClass(Class responseClass) {
+    public ApiMethod<RESULT> setResponseClass(Class responseClass) {
         this.responseClass = responseClass;
+        return this;
     }
 
     /**

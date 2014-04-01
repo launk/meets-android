@@ -134,10 +134,10 @@ public class MageMeetsCategory extends MageMeetsModel<MeetsCategory> implements 
     }
 
 //    @Override
-//    protected void updateFromFetchedResult(Object fetchedResult) {
+//    protected void updateFromResult(Object fetchedResult) {
 //        if ( onlyChildren )
 //            children = (MageApiMethodCollectionResponseClasses.Categories) fetchedResult;
 //        else
-//            super.updateFromFetchedResult(fetchedResult);
+//            super.updateFromResult(fetchedResult);
 //    }
 }

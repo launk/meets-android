@@ -56,6 +56,11 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
     private List<Shipping> shippingMethods;
     private List<Payment> paymentMethods;
     private String lastOrderId;
+    private MeetsCustomer attachedCustomer;
+    private MeetsAddress attachedBillingAddress;
+    private MeetsAddress attachedShippingAddress;
+    private Shipping attachedShippingMethod;
+    private Payment attachedPaymentMethod;
 
     {
         //Disable cache for the entire model operations
@@ -80,6 +85,26 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
         return this;
     }
 
+    private void resetFields() {
+        quote_id = 0;
+        items_count = 0;
+        checkout_method = null;
+        customer_id = null;
+        items_qty = 0;
+        subtotal = 0;
+        grand_total = 0;
+
+        items = null;
+        shippingMethods = null;
+        paymentMethods = null;
+        lastOrderId = null;
+        attachedCustomer = null;
+        attachedBillingAddress = null;
+        attachedShippingAddress = null;
+        attachedShippingMethod = null;
+        attachedPaymentMethod = null;
+    }
+
     @Override
     public MeetsCart setId(int id) {
         quote_id = id;
@@ -94,7 +119,13 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
     @Override
     public MeetsCart create() {
         pushMethod(new ShoppingCartCreate())
-                .done(updateFromResult)
+                .done(new DoneCallback() {
+                    @Override
+                    public void onDone(Object result) {
+                        resetFields();
+                        updateFromResult(result);
+                    }
+                })
                 .always(triggerListeners);
         nextWaitForPrevious();
         return this;
@@ -122,7 +153,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                 return params;
             }
         };
-
+        attachedCustomer = customer;
         pushMethod(new ShoppingCartCustomerSet(), params).always(triggerListeners);
         return this;
     }
@@ -145,7 +176,8 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                 return params;
             }
         };
-
+        attachedBillingAddress = billingAddress;
+        attachedShippingAddress = shippingAddress;
         pushMethod(new ShoppingCartCustomerAddresses(), params).always(triggerListeners);
         return this;
     }
@@ -161,7 +193,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                 return params;
             }
         };
-
+        attachedShippingMethod = shipping;
         pushMethod(new ShoppingCartShippingMethod(), params).always(triggerListeners);
         return this;
     }
@@ -177,7 +209,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                 return params;
             }
         };
-
+        attachedPaymentMethod = paymentMethod;
         pushMethod(new ShoppingCartPaymentMethod(), params).always(triggerListeners);
         return this;
     }
@@ -412,6 +444,31 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
     @Override
     public String getOrderId() {
         return lastOrderId;
+    }
+
+    @Override
+    public MeetsCustomer getAttachedCustomer() {
+        return attachedCustomer;
+    }
+
+    @Override
+    public MeetsAddress getAttachedBillingAddress() {
+        return attachedBillingAddress;
+    }
+
+    @Override
+    public MeetsAddress getAttachedShippingAddress() {
+        return attachedShippingAddress;
+    }
+
+    @Override
+    public Shipping getAttachedShippingMethod() {
+        return attachedShippingMethod;
+    }
+
+    @Override
+    public Payment getAttachedPaymentMethod() {
+        return attachedPaymentMethod;
     }
 
     @Override

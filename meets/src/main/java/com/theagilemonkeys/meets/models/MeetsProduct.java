@@ -18,7 +18,7 @@ public interface MeetsProduct extends MeetsModel<MeetsProduct> {
     String getDescription();
     double getPrice();
     String getImageUrl();
-    Map<String, String> getImages();
+    List<String> getImages();
     Map<String, String> getAdditionalAttributes();
     List<MeetsProduct> getAssociatedProducts();
 

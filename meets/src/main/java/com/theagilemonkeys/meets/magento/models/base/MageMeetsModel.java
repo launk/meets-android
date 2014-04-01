@@ -40,7 +40,7 @@ public abstract class MageMeetsModel<MODEL extends MeetsModel> extends Serializa
      * to this, using the Copier instance returned by getCopier()
      * @param fetchedResult
      */
-    protected void updateFromFetchedResult(Object fetchedResult){
+    protected void updateFromResult(Object fetchedResult){
         getCopier().copyProperties(this, fetchedResult);
     }
 
@@ -54,7 +54,7 @@ public abstract class MageMeetsModel<MODEL extends MeetsModel> extends Serializa
     protected transient DoneCallback updateFromResult = new DoneCallback() {
         @Override
         public void onDone(Object result) {
-            updateFromFetchedResult(result);
+            updateFromResult(result);
         }
     };
 
