@@ -142,8 +142,6 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
     public void onRequestFailure(SpiceException e) {
         if(runDeferred.isPending()) {
             runDeferred.reject(e);
-            Meets.globalListener.onFail(null, e);
-            Meets.globalListener.onAlways(null, e);
         }
     }
 
@@ -151,8 +149,6 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
     public void onRequestSuccess(RESULT response) {
         if(runDeferred.isPending()) {
             runDeferred.resolve(response);
-            Meets.globalListener.onDone(null);
-            Meets.globalListener.onAlways(null, null);
         }
     }
 

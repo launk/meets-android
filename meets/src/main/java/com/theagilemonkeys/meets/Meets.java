@@ -21,8 +21,6 @@ public class Meets {
     public static int storeId;
     public static int websiteId;
 
-    static MeetsListener globalListener = new MeetsListener.Empty();
-
     // Package private spiceManager.
     static SpiceManager spiceManager = new SpiceManager(MeetsSpiceService.class);
 
@@ -71,6 +69,8 @@ public class Meets {
      *                 memory leak (This doesn't happen when parent class is the Application)
      */
     public static void setGlobalListener(MeetsListener listener) {
-        globalListener = listener;
+        ApiMethodModelHelper.globalListener = listener;
     }
+
+
 }

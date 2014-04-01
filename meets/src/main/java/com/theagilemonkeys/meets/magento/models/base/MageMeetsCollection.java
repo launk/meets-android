@@ -244,6 +244,11 @@ public class MageMeetsCollection<MODEL extends MeetsModel> extends ArrayList<MOD
     }
 
     @Override
+    public void ignoreGlobalListener() {
+        apiMethodCtrl.ignoreGlobalListener();
+    }
+
+    @Override
     public MeetsCollection<MODEL> await(MeetsListener<MeetsCollection<MODEL>> listener) {
         return apiMethodCtrl.await(listener);
     }

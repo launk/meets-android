@@ -11,6 +11,12 @@ import com.theagilemonkeys.meets.models.base.MeetsListener;
  * Class that let us work with asynchronous methods and listeners
  */
 public interface ApiMethodModelHelperInterface<MODEL> {
+
+    /**
+     * If you call this method, the next call to global listener will be ignored. This normally used
+     * inside your model listeners.
+     */
+    void ignoreGlobalListener();
     /**
      * Waits for all asynchronous methods to be finished and then notify the listener. After
      * that, the listener is removed from this model's listeners. If there is no pending methods,

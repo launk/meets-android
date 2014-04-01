@@ -123,6 +123,11 @@ public abstract class MageMeetsModel<MODEL extends MeetsModel> extends Serializa
     }
 
     @Override
+    public void ignoreGlobalListener() {
+        apiMethodCtrl.ignoreGlobalListener();
+    }
+
+    @Override
     public MODEL await(MeetsListener<MODEL> listener) {
         return apiMethodCtrl.await(listener);
     }

@@ -21,13 +21,16 @@ import java.util.Map;
  * @author Álvaro López Espinosa
  */
 public class ApiMethodModelHelper<MODEL> implements ApiMethodModelHelperInterface<MODEL> {
+    static MeetsListener globalListener = new MeetsListener.Empty();
 
+    boolean ignoreGlobalListener = false;
     protected transient Map<MeetsListener<MODEL>, Boolean> listenersWithKeepInfo = new HashMap<MeetsListener<MODEL>, Boolean>();
     protected transient Deferred masterPromise = new DeferredObject().resolve(this);
     private boolean serially = false;
     private Boolean forceNextCacheEnable = null;
     private boolean modelCacheEnable = true;
     private MODEL model;
+
 
     public ApiMethodModelHelper(MODEL model){
         this.model = model;
@@ -103,6 +106,11 @@ public class ApiMethodModelHelper<MODEL> implements ApiMethodModelHelperInterfac
     }
 
     @Override
+    public void ignoreGlobalListener() {
+        ignoreGlobalListener = true;
+    }
+
+    @Override
     public MODEL await(MeetsListener<MODEL> listener) {
         await(listener, false);
         return model;
@@ -112,6 +120,7 @@ public class ApiMethodModelHelper<MODEL> implements ApiMethodModelHelperInterfac
     public MODEL await(MeetsListener<MODEL> listener, boolean keepListening) {
         if ( ! masterPromise.isPending() ){
             Exception e = new Exception("Last operation failed");
+            //Generify this to avoid duplicate code here and inside triggerListeners
             if ( masterPromise.isResolved() ) listener.onDone(model);
             else if (masterPromise.isRejected()) listener.onFail(model, e);
             listener.onAlways(model, e);
@@ -140,6 +149,7 @@ public class ApiMethodModelHelper<MODEL> implements ApiMethodModelHelperInterfac
     public void triggerListeners() {
         triggerListeners(null);
     }
+
     public void triggerListeners(Exception e) {
         if (masterPromise.isPending()) return;
         Iterator<Map.Entry<MeetsListener<MODEL>, Boolean>> entries = listenersWithKeepInfo.entrySet().iterator();
@@ -154,6 +164,15 @@ public class ApiMethodModelHelper<MODEL> implements ApiMethodModelHelperInterfac
             else listener.onFail(model, e);
             listener.onAlways(model, e);
         }
+
+        // Call global listener
+        if (! ignoreGlobalListener ) {
+            if (e == null) globalListener.onDone(null);
+            else globalListener.onFail(null, e);
+            globalListener.onAlways(null, e);
+        }
+        ignoreGlobalListener = false;
+
     }
 
     public Map<MeetsListener<MODEL>, Boolean> getListenersWithKeepInfo() {

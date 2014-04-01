@@ -26,7 +26,6 @@ dependencies {
     compile 'org.jdeferred:jdeferred-core:1.1.0'
 
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.3.2'
-//    compile 'com.fasterxml.jackson.core:jackson-annotations:2.2.0'
 
     compile fileTree(dir: 'libs', include: '*.jar')
 }

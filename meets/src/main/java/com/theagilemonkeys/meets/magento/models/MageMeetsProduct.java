@@ -174,7 +174,8 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
 
     @Override
     public Map<String, String> getAdditionalAttributes() {
-        return parsedAdditionalAttributes;
+        throw new UnsupportedOperationException("Not implemented yet");
+//        return parsedAdditionalAttributes;
     }
 
     @Override
