@@ -29,8 +29,11 @@ public class SoapParser {
     /**
      * Annotation to allow specify the type of collections
      */
-    public @Retention(RetentionPolicy.RUNTIME) @interface ListType {
+    public @Retention(RetentionPolicy.RUNTIME) @interface ListInfo {
         Class value();
+//        Class listClass() default ArrayList.class;
+//        Class itemClass() default null;
+
     }
     /**
      * Annotation to allow specify the type of map
@@ -191,7 +194,7 @@ public class SoapParser {
 
         // Only in these cases an specific class is needed
         if ( Modifier.isAbstract(modifiers) || Modifier.isInterface(modifiers) ){
-            ListType listTypeAnnotation = field.getAnnotation(ListType.class);
+            ListInfo listTypeAnnotation = field.getAnnotation(ListInfo.class);
 
             if ( listTypeAnnotation != null )
                 fieldType = listTypeAnnotation.value();

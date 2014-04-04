@@ -50,7 +50,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
     @Key private double subtotal = 0;
     @Key private double grand_total = 0;
     @Key
-    @SoapParser.ListType(MageApiMethodCollectionResponseClasses.CartItems.class)
+    @SoapParser.ListInfo(MageApiMethodCollectionResponseClasses.CartItems.class)
     private List<Item> items;
 
     private List<Shipping> shippingMethods;
@@ -285,7 +285,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                     }
                 })
                 .always(triggerListeners);
-        return null;
+        return this;
     }
 
     private void localAddItems(List<Item> items) {

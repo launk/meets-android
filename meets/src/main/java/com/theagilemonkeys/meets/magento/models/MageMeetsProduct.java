@@ -1,15 +1,12 @@
 package com.theagilemonkeys.meets.magento.models;
 
 import com.google.api.client.util.Key;
-import com.theagilemonkeys.meets.ApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.ApiMethodModelHelper;
-import com.theagilemonkeys.meets.magento.methods.CatalogProductInfo;
-import com.theagilemonkeys.meets.magento.methods.CatalogProductList;
+import com.theagilemonkeys.meets.magento.methods.CatalogProductGetSuperAttributes;
 import com.theagilemonkeys.meets.magento.methods.Products;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsProduct;
 import com.theagilemonkeys.meets.utils.StringUtils;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
 
 import org.jdeferred.DoneCallback;
 
@@ -36,11 +33,14 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     @Key private String image_url;
     @Key private Double final_price_with_tax;
     @Key private String price;
-    @Key private ApiMethodCollectionResponseClasses.ListOfGenericMaps additional_attributes;
-
-    private Map<String, String> parsedAdditionalAttributes;
+//    @Key private ApiMethodCollectionResponseClasses.ListOfGenericMaps additional_attributes;
+//
+//    private Map<String, String> parsedAdditionalAttributes;
     private List<MeetsProduct> associatedProducs;
     private List<String> images;
+    private List<Attribute> attributes;
+    private ConfigurationsData configurationData;
+    private Configuration configuration;
 
     @Override
     public MeetsProduct fetch() {
@@ -105,6 +105,11 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
         return images;
     }
 
+//    @Override
+//    public List<Attribute> getAttributes() {
+//        return attributes;
+//    }
+
     @Override
     public double getPrice() {
         return final_price_with_tax != null ? final_price_with_tax
@@ -140,32 +145,21 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     }
 
     @Override
-    public MeetsProduct fetchWithAdditionalAttributes(String... additionalAttributes) {
-        return fetchWithAdditionalAttributes(Arrays.asList(additionalAttributes));
-    }
-
-    @Override
-    public MeetsProduct fetchWithAdditionalAttributes(final List<String> additionalAttributes) {
+    public MeetsProduct fetchConfigurationsData() {
         ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
             @Override
             public Map<String, Object> buildParams() {
-                Serializable.List serializableAdditionalAttrs = new Serializable.List(additionalAttributes);
-
-                Map<String, Object> attributes = new Serializable.Map<String, Object>();
-                attributes.put("additional_attributes", serializableAdditionalAttrs);
-
-                Map<String, Object> params = new HashMap<String, Object>();
-                params.put("product", getId());
-                params.put("attributes", attributes);
-                return params;
+                Map<String, Object> param = new HashMap<String, Object>();
+                param.put("product",getId());
+                return param;
             }
         };
 
-        pushMethod(new CatalogProductInfo(), params)
+        pushMethod(new CatalogProductGetSuperAttributes(), params)
                 .done(new DoneCallback() {
                     @Override
                     public void onDone(Object result) {
-//                        debería tener ya aquí los valores de los attributos
+                        configurationData = (ConfigurationsData) result;
                     }
                 })
                 .always(triggerListeners);
@@ -173,46 +167,71 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     }
 
     @Override
-    public Map<String, String> getAdditionalAttributes() {
-        throw new UnsupportedOperationException("Not implemented yet");
-//        return parsedAdditionalAttributes;
+    public ConfigurationsData getConfigurationData() {
+        return configurationData;
     }
 
     @Override
-    public MeetsProduct fetchAssociatedProducts() {
-        ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
-            @Override
-            public Map<String, Object> buildParams() {
-                List<Map<String, Object>> complexFilter = new Serializable.List<Map<String, Object>>();
-                Map<String, Object> filter = new Serializable.Map<String, Object>();
-                Map<String, Object> filterValue = new Serializable.Map<String, Object>();
-                filterValue.put("key", "like");
-                filterValue.put("value", sku + "-%");
-                filter.put("key", "sku");
-                filter.put("value", filterValue);
-                complexFilter.add(filter);
-
-                Map<String, Object> filters = new Serializable.Map<String, Object>();
-                filters.put("complex_filter", complexFilter);
-
-                Map<String, Object> params = new HashMap<String, Object>();
-                params.put("filters",filters);
-                return params;
-            }
-        };
-
-        pushMethod(new CatalogProductList(), params).done(new DoneCallback() {
-            @Override
-            public void onDone(Object result) {
-                associatedProducs = (List<MeetsProduct>) result;
-                //Images are not returned by this call, so get the parent one
-                for (MeetsProduct product : associatedProducs) {
-                    ((MageMeetsProduct) product).image_url = image_url;
-                }
-            }
-        })
-        .always(triggerListeners);
-
+    public MeetsProduct setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
         return this;
     }
+
+    @Override
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+//    @Override
+//    public MeetsProduct fetchWithAdditionalAttributes(String... additionalAttributes) {
+//        return fetchWithAdditionalAttributes(Arrays.asList(additionalAttributes));
+//    }
+//
+//    @Override
+//    public MeetsProduct fetchWithAdditionalAttributes(final List<String> additionalAttributes) {
+//        throw new UnsupportedOperationException("Not implemented yet");
+//    }
+//
+//    @Override
+//    public Map<String, String> getAdditionalAttributes() {
+//        throw new UnsupportedOperationException("Not implemented yet");
+//    }
+
+//    @Override
+//    public MeetsProduct fetchAssociatedProducts() {
+//        ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
+//            @Override
+//            public Map<String, Object> buildParams() {
+//                List<Map<String, Object>> complexFilter = new Serializable.List<Map<String, Object>>();
+//                Map<String, Object> filter = new Serializable.Map<String, Object>();
+//                Map<String, Object> filterValue = new Serializable.Map<String, Object>();
+//                filterValue.put("key", "like");
+//                filterValue.put("value", sku + "-%");
+//                filter.put("key", "sku");
+//                filter.put("value", filterValue);
+//                complexFilter.add(filter);
+//
+//                Map<String, Object> filters = new Serializable.Map<String, Object>();
+//                filters.put("complex_filter", complexFilter);
+//
+//                Map<String, Object> params = new HashMap<String, Object>();
+//                params.put("filters",filters);
+//                return params;
+//            }
+//        };
+//
+//        pushMethod(new CatalogProductList(), params).done(new DoneCallback() {
+//            @Override
+//            public void onDone(Object result) {
+//                associatedProducs = (List<MeetsProduct>) result;
+//                //Images are not returned by this call, so get the parent one
+//                for (MeetsProduct product : associatedProducs) {
+//                    ((MageMeetsProduct) product).image_url = image_url;
+//                }
+//            }
+//        })
+//        .always(triggerListeners);
+//
+//        return this;
+//    }
 }

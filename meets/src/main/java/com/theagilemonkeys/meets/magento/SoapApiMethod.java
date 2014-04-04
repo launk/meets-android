@@ -2,6 +2,8 @@ package com.theagilemonkeys.meets.magento;
 
 import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theagilemonkeys.meets.ApiMethod;
 import com.theagilemonkeys.meets.utils.soap.SoapParser;
 
@@ -43,9 +45,17 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
 
     public static int timeout = 1 * 60 * 1000; // 1 minute timeout
 
+    private boolean isJsonResponse = false;
+
     public SoapApiMethod(Class magentoModelClass) {
         super(magentoModelClass);
     }
+
+    public SoapApiMethod(Class magentoModelClass, boolean isJsonResponse) {
+        this(magentoModelClass);
+        this.isJsonResponse = isJsonResponse;
+    }
+
     @Override
     public Deferred run(Map<String, Object> params, List<String> urlExtraSegments) {
         return super.run(params, urlExtraSegments);
@@ -60,20 +70,32 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
         SoapParser.parse((SoapObject) response, model);
     }
 
+    protected RESULT parseJsonResponse(Object res) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return (RESULT) mapper.readValue((String) res, responseClass);
+    }
+
     @Override
     public RESULT loadDataFromNetwork() throws Exception {
         ensureApiLogin();
 
         Object res = send(getMethodName(), params);
 
-        if (SoapParser.isPrimitiveOrInmutable(responseClass)) {
+        if (isJsonResponse) {
+
+
+            return parseJsonResponse(res);
+        }
+        else if (SoapParser.isPrimitiveOrInmutable(responseClass)) {
             return (RESULT) res;
-        } else {
+        }
+        else {
             RESULT model = (RESULT) responseClass.newInstance();
             parseResponse(res, model);
             return model;
         }
     }
+
 
     private Object send(String method, Map<String, Object> params) throws IOException, XmlPullParserException {
         HttpTransportSE httpTransport = new HttpTransportSE(baseUrl,timeout);

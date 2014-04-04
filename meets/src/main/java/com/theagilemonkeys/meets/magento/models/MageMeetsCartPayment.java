@@ -22,6 +22,7 @@ public class MageMeetsCartPayment extends Serializable.Object implements MeetsCa
     @Key private String cc_type;
     @Key private String cc_exp_year;
     @Key private String cc_exp_month;
+    @Key private String payment_token;
 
     @Override
     public String getTitle() {
@@ -78,6 +79,12 @@ public class MageMeetsCartPayment extends Serializable.Object implements MeetsCa
     @Override
     public MeetsCart.Payment setCcExpMonth(String ccExpMonth) {
         cc_exp_month = ccExpMonth;
+        return this;
+    }
+
+    @Override
+    public MeetsCart.Payment setPaymentToken(String token) {
+        payment_token = token;
         return this;
     }
 

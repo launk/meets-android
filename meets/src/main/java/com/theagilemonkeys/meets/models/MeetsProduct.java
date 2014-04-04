@@ -2,6 +2,7 @@ package com.theagilemonkeys.meets.models;
 
 import com.theagilemonkeys.meets.models.base.MeetsModel;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -19,12 +20,37 @@ public interface MeetsProduct extends MeetsModel<MeetsProduct> {
     double getPrice();
     String getImageUrl();
     List<String> getImages();
-    Map<String, String> getAdditionalAttributes();
     List<MeetsProduct> getAssociatedProducts();
 
     MeetsProduct fetchImages();
-    MeetsProduct fetchWithAdditionalAttributes(String... additionalAttributes);
-    MeetsProduct fetchWithAdditionalAttributes(List<String> additionalAttributes);
-    MeetsProduct fetchAssociatedProducts();
+    MeetsProduct fetchConfigurationsData();
+    ConfigurationsData getConfigurationData();
+    MeetsProduct setConfiguration(Configuration configuration);
+    Configuration getConfiguration();
 
+    public interface ConfigurationsData extends Serializable {
+        List<Attribute> getAttributes();
+        Attribute getAttribute(int attributeId);
+        Attribute.Option getOption(int attributeId, int optionId);
+        List<Configuration> getConfigurations();
+        double calculateTotalPrice(double basePrice, Configuration configuration);
+    }
+
+    public interface Configuration extends Serializable{
+        Map<Integer, Integer> getAttributeOptionMap();
+        int getStock();
+    }
+
+    public interface Attribute extends Serializable {
+        int getId();
+        String getLabel();
+        List<Option> getOptions();
+
+        public interface Option extends Serializable {
+            int getId();
+            String getLabel();
+            double getPriceOffset();
+            boolean isPercentageOffset();
+        }
+    }
 }

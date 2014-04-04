@@ -6,11 +6,13 @@ import com.theagilemonkeys.meets.magento.methods.Products;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsCart;
 import com.theagilemonkeys.meets.models.MeetsProduct;
+import com.theagilemonkeys.meets.utils.soap.Serializable;
 
 import org.jdeferred.DoneCallback;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Android Meets SDK
@@ -26,6 +28,7 @@ public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements
     @Key private String name;
     @Key private String description;
     @Key private double price;
+    @Key private Serializable.List<Serializable.Map<String, String>> super_attribute;
 
     private MeetsProduct relatedProduct;
 
@@ -37,7 +40,22 @@ public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements
         description = product.getDescription();
         price = product.getPrice();
         relatedProduct = product;
+        fillSuperAttributes(product);
         return this;
+    }
+
+    private void fillSuperAttributes(MeetsProduct product) {
+        if("configurable".equals(product.getType())) {
+            MeetsProduct.Configuration config = product.getConfiguration();
+            if(config == null) return;
+            super_attribute = new Serializable.List<Serializable.Map<String, String>>();
+            for(Map.Entry<Integer, Integer> entry : config.getAttributeOptionMap().entrySet()) {
+                Serializable.Map<String, String> option = new Serializable.Map<String, String>();
+                option.put("key", String.valueOf(entry.getKey()));
+                option.put("value", String.valueOf(entry.getValue()));
+                super_attribute.add(option);
+            }
+        }
     }
 
     @Override
