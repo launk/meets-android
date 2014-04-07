@@ -18,6 +18,8 @@ public interface MeetsProduct extends MeetsModel<MeetsProduct> {
     String getName();
     String getDescription();
     double getPrice();
+    double getPriceOfConfiguration(Configuration config);
+    double getPriceOfSelectedConfiguration();
     String getImageUrl();
     List<String> getImages();
     List<MeetsProduct> getAssociatedProducts();

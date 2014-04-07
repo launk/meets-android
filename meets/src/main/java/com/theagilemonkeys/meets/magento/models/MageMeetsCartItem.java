@@ -22,6 +22,10 @@ import java.util.Map;
  */
 public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements MeetsCart.Item {
 
+    @Key private String item_id;
+    @Key private String parent_item_id;
+    @Key private String product_type;
+
     @Key private String product_id;
     @Key private String sku;
     @Key private double qty = 1;
@@ -30,6 +34,7 @@ public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements
     @Key private double price;
     @Key private Serializable.List<Serializable.Map<String, String>> super_attribute;
 
+    private MeetsProduct.Configuration configuration;
     private MeetsProduct relatedProduct;
 
     @Override
@@ -38,18 +43,19 @@ public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements
         sku = product.getSku();
         name = product.getName();
         description = product.getDescription();
-        price = product.getPrice();
+        price = product.getPriceOfSelectedConfiguration();
+        product_type = product.getType();
         relatedProduct = product;
         fillSuperAttributes(product);
         return this;
     }
 
     private void fillSuperAttributes(MeetsProduct product) {
-        if("configurable".equals(product.getType())) {
-            MeetsProduct.Configuration config = product.getConfiguration();
-            if(config == null) return;
+        if("configurable".equals(product_type)) {
+            configuration = product.getConfiguration();
+            if(configuration == null) return;
             super_attribute = new Serializable.List<Serializable.Map<String, String>>();
-            for(Map.Entry<Integer, Integer> entry : config.getAttributeOptionMap().entrySet()) {
+            for(Map.Entry<Integer, Integer> entry : configuration.getAttributeOptionMap().entrySet()) {
                 Serializable.Map<String, String> option = new Serializable.Map<String, String>();
                 option.put("key", String.valueOf(entry.getKey()));
                 option.put("value", String.valueOf(entry.getValue()));
@@ -94,12 +100,27 @@ public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements
 
     @Override
     public int getProductId() {
-        return Integer.parseInt(product_id);
+        return product_id == null ? 0 : Integer.parseInt(product_id);
     }
 
     @Override
     public String getProductSku() {
         return sku;
+    }
+
+    @Override
+    public String getProductType() {
+        return product_type;
+    }
+
+    @Override
+    public MeetsProduct.Configuration getConfiguration() {
+        return configuration;
+    }
+
+    @Override
+    public int getParentItemId() {
+        return parent_item_id == null ? 0 : Integer.parseInt(parent_item_id);
     }
 
     @Override
@@ -139,22 +160,14 @@ public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements
         throw new UnsupportedOperationException("Cart items can not be fetched individually. Work with them through MeetsCart");
     }
 
-    /**
-     * Alias of {@link #setProductId(int)}
-     * @param productId Product id
-     * @return This object
-     */
     @Override
-    public MeetsCart.Item setId(int productId) {
-        return setProductId(productId);
+    public MeetsCart.Item setId(int id) {
+        item_id = String.valueOf(id);
+        return this;
     }
 
-    /**
-     * Alias of {@link #getProductId()}
-     * @return Product id
-     */
     @Override
     public int getId() {
-        return getProductId();
+        return Integer.parseInt(item_id);
     }
 }

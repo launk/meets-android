@@ -34,5 +34,4 @@ public class MageMeetsProductConfiguration extends Serializable.Object implement
     public int getStock() {
         return stock;
     }
-
 }

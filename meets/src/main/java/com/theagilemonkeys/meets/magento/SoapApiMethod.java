@@ -82,8 +82,6 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
         Object res = send(getMethodName(), params);
 
         if (isJsonResponse) {
-
-
             return parseJsonResponse(res);
         }
         else if (SoapParser.isPrimitiveOrInmutable(responseClass)) {

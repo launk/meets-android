@@ -25,11 +25,9 @@ import com.theagilemonkeys.meets.utils.soap.SoapParser;
 
 import org.jdeferred.DoneCallback;
 import org.jdeferred.FailCallback;
-import org.jdeferred.Promise;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -300,7 +298,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
         double qty = item.getQuantity();
 
         for(Item localItem : items){
-            if( localItem.getProductId() == item.getProductId() ){
+            if( productsAreTheSame(localItem, item) ){
                 localItem.incQuantity(qty);
                 localCartItem = localItem;
                 break;
@@ -317,41 +315,48 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
         items_qty +=  qty;
     }
 
-    @Override
-    public MeetsCart removeItem(int productId, double quantity) {
-        return removeItems(Arrays.asList(productId), Arrays.asList(quantity));
-    }
+    private boolean productsAreTheSame(Item itemA, Item itemB) {
+        boolean areTheSame = ( itemA.getProductId() == itemB.getProductId() );
+        if (areTheSame) {
+            MeetsProduct.Configuration configA = itemA.getConfiguration();
+            MeetsProduct.Configuration configB = itemB.getConfiguration();
 
-    @Override
-    public MeetsCart removeItem(int productId) {
-        return removeItems(Arrays.asList(productId), Collections.<Double>emptyList());
-    }
-
-    @Override
-    public MeetsCart removeItems(List<Integer> productIds) {
-        return removeItems(productIds, Collections.<Double>emptyList());
-    }
-
-    @Override
-    public MeetsCart removeItems(List<Integer> productIds, List<Double> quantities) {
-        List<Item> items = new ArrayList<Item>();
-        int productIdsLength = productIds.size();
-        int quantitiesLength = quantities.size();
-        for(int i = 0; i < productIdsLength; ++i) {
-            int productId = productIds.get(i);
-            double quantity = Integer.MAX_VALUE;
-            if (quantitiesLength > 0)
-                quantity = quantities.get(i % quantitiesLength);
-
-            items.add(MeetsFactory.get().makeCartItem()
-                    .setProductId(productId)
-                    .setQuantity(quantity));
+            // If items have the related product and both are configurables, we do an extra check to
+            // ensure they have the same configuration.
+            if ( ("configurable".equals(itemA.getProductType()) || "configurable".equals(itemB.getProductType())) &&
+                 configA != null && configB != null) {
+                areTheSame = configA.getAttributeOptionMap().equals(configB.getAttributeOptionMap());
+            }
         }
-        return internalRemoveItems(items);
+        return areTheSame;
     }
 
 
-    private MeetsCart internalRemoveItems(List<Item> items) {
+    @Override
+    public MeetsCart removeItem(MeetsProduct product, double quantity) {
+        return removeItems(Arrays.asList(MeetsFactory.get().makeCartItem(product).setQuantity(quantity)));
+    }
+
+    @Override
+    public MeetsCart removeItem(Item item) {
+        return removeItems(Arrays.asList(item));
+    }
+
+    @Override
+    public MeetsCart removeItems(List<MeetsProduct> products, List<Double> quantities) {
+        List<Item> items = new ArrayList<Item>();
+        int productsLength = products.size();
+        int quantitiesLength = quantities.size();
+        for(int i = 0; i < productsLength; ++i) {
+            MeetsProduct product = products.get(i);
+            double quantity = quantities.get(i % quantitiesLength);
+            items.add(MeetsFactory.get().makeCartItem(product).setQuantity(quantity));
+        }
+        return removeItems(items);
+    }
+
+    @Override
+    public MeetsCart removeItems(List<Item> items) {
         final List<Item> removedItems = localRemoveItems(items);
 
         if( ! removedItems.isEmpty() ){
@@ -379,7 +384,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                     .always(triggerListeners);
         }
         else {
-            triggerListeners.onAlways(Promise.State.RESOLVED, this, null);
+            triggerListeners();
         }
         return this;
     }
@@ -400,7 +405,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
         Item localCartItem = null;
 
         for(Item item : items){
-            if( item.getProductId() == itemToRemove.getProductId() ){
+            if( productsAreTheSame(item, itemToRemove) ){
                 localCartItem = item;
                 break;
             }

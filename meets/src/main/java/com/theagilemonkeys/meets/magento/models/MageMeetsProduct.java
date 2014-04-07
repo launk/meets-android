@@ -117,6 +117,20 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     }
 
     @Override
+    public double getPriceOfConfiguration(Configuration config) {
+        double totalPrice = getPrice();
+        if(configurationData != null && config != null) {
+            totalPrice = configurationData.calculateTotalPrice(totalPrice, config);
+        }
+        return totalPrice;
+    }
+
+    @Override
+    public double getPriceOfSelectedConfiguration() {
+        return getPriceOfConfiguration(configuration);
+    }
+
+    @Override
     public List<MeetsProduct> getAssociatedProducts() {
         return associatedProducs;
     }

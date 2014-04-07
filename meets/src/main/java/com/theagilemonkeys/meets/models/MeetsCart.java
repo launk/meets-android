@@ -32,15 +32,10 @@ public interface MeetsCart extends MeetsModel<MeetsCart> {
     MeetsCart addItems(List<MeetsProduct> products, List<Double> quantities);
     MeetsCart addItems(List<Item> items);
 
-    MeetsCart removeItem(int productId, double quantity);
-    /**
-     * Remove all product units from the cart
-     * @param productId
-     * @return
-     */
-    MeetsCart removeItem(int productId);
-    MeetsCart removeItems(List<Integer> productIds, List<Double> quantities);
-    MeetsCart removeItems(List<Integer> productIds);
+    MeetsCart removeItem(MeetsProduct product, double quantity);
+    MeetsCart removeItem(Item item);
+    MeetsCart removeItems(List<MeetsProduct> products, List<Double> quantities);
+    MeetsCart removeItems(List<Item> items);
 
     MeetsCart attachCustomer(MeetsCustomer customer);
     MeetsCart attachCustomerAsGuest(MeetsCustomer customer);
@@ -62,6 +57,10 @@ public interface MeetsCart extends MeetsModel<MeetsCart> {
         double getPrice();
         int getProductId();
         String getProductSku();
+        String getProductType();
+        int getParentItemId();
+
+        MeetsProduct.Configuration getConfiguration();
         MeetsProduct getRelatedProduct();
 
         Item setProductId(int productId);
