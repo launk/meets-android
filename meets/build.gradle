@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 19
-        versionCode 1
-        versionName "0.0.1"
+        versionCode Integer.parseInt(VERSION_CODE)
+        versionName VERSION_NAME
     }
 
     buildTypes {
@@ -30,3 +30,5 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: '*.jar')
 }
+
+apply from: '../mvn-push.gradle'
