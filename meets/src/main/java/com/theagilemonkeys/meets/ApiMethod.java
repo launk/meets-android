@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -113,7 +114,8 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
     public Deferred run(Map<String, Object> params, List<String> urlExtraSegments){
         runDeferred = new DeferredObject();
 
-        this.params = new HashMap<String, Object>(fixedParams);
+        this.params = new TreeMap(String.CASE_INSENSITIVE_ORDER);
+        this.params.putAll(fixedParams);
         if (params != null)
             this.params.putAll(params);
 

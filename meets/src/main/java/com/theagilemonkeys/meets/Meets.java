@@ -28,7 +28,7 @@ public class Meets {
      * Initializer method for Meets. You will usually call it in your {@code App.onCreate} method.
      * @param applicationContext The application context
      * @param factory The MeetsFactory implementation instance that will be used.
-     *                Now only {@link com.theagilemonkeys.meets.magento.models.base.MageMeetsFactory MageMeetsFactory} is supported
+     *                You can use {@link com.theagilemonkeys.meets.magento.models.base.MageMeetsFactory MageMeetsFactory}.
      * @param hostUrl The url of your e-commerce host. For example: {@code "http://www.example.com" }
      * @param soapApiUser The SOAP API user of your host
      * @param soapApiPass The SOAP API password of your host
@@ -72,5 +72,11 @@ public class Meets {
         ApiMethodModelHelper.globalListener = listener;
     }
 
-
+    /**
+     * Returns the underlying SpiceManager used in all requests.
+     * @return SpiceManager
+     */
+    public static SpiceManager getSpiceManager() {
+        return spiceManager;
+    }
 }
