@@ -1,12 +1,10 @@
 package com.theagilemonkeys.meets.magento.models;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.api.client.util.Key;
 import com.theagilemonkeys.meets.models.MeetsProduct;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,17 +13,12 @@ import java.util.List;
  *
  * @author Álvaro López Espinosa
  */
-@JsonAutoDetect(
-        fieldVisibility = JsonAutoDetect.Visibility.ANY,
-        getterVisibility = JsonAutoDetect.Visibility.NONE,
-        isGetterVisibility = JsonAutoDetect.Visibility.NONE,
-        setterVisibility = JsonAutoDetect.Visibility.NONE
-)
-public class MageMeetsProductAttribute extends Serializable.Object implements MeetsProduct.Attribute {
+
+public class MageMeetsProductAttribute extends SoapSerializableObject implements MeetsProduct.Attribute {
     @Key int id;
     @Key String label;
     @Key
-    @JsonDeserialize(as = ArrayList.class, contentAs = MageOption.class)
+    @JsonTypeInfo(use= JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="class", defaultImpl = MageOption.class)
     List<Option> options;
 
     @Override
@@ -43,12 +36,6 @@ public class MageMeetsProductAttribute extends Serializable.Object implements Me
         return options;
     }
 
-    @JsonAutoDetect(
-            fieldVisibility = JsonAutoDetect.Visibility.ANY,
-            getterVisibility = JsonAutoDetect.Visibility.NONE,
-            isGetterVisibility = JsonAutoDetect.Visibility.NONE,
-            setterVisibility = JsonAutoDetect.Visibility.NONE
-    )
     static public class MageOption implements MeetsProduct.Attribute.Option {
 
         @Key int id;

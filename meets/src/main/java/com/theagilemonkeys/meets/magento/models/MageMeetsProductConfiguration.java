@@ -1,9 +1,8 @@
 package com.theagilemonkeys.meets.magento.models;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.google.api.client.util.Key;
 import com.theagilemonkeys.meets.models.MeetsProduct;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableObject;
 
 import java.util.Map;
 
@@ -13,13 +12,8 @@ import java.util.Map;
  *
  * @author Álvaro López Espinosa
  */
-@JsonAutoDetect(
-        fieldVisibility = JsonAutoDetect.Visibility.ANY,
-        getterVisibility = JsonAutoDetect.Visibility.NONE,
-        isGetterVisibility = JsonAutoDetect.Visibility.NONE,
-        setterVisibility = JsonAutoDetect.Visibility.NONE
-)
-public class MageMeetsProductConfiguration extends Serializable.Object implements MeetsProduct.Configuration {
+
+public class MageMeetsProductConfiguration extends SoapSerializableObject implements MeetsProduct.Configuration {
     @Key
     Map<Integer, Integer> configuration;
     @Key

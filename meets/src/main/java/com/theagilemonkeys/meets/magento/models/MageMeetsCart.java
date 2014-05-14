@@ -20,8 +20,8 @@ import com.theagilemonkeys.meets.models.MeetsCart;
 import com.theagilemonkeys.meets.models.MeetsCustomer;
 import com.theagilemonkeys.meets.models.MeetsProduct;
 import com.theagilemonkeys.meets.models.base.MeetsFactory;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
 import com.theagilemonkeys.meets.utils.soap.SoapParser;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableList;
 
 import org.jdeferred.DoneCallback;
 import org.jdeferred.FailCallback;
@@ -164,7 +164,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
         ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
             @Override
             public Map<String, Object> buildParams() {
-                Serializable.List<MageMeetsAddress> addresses = new Serializable.List<MageMeetsAddress>();
+                SoapSerializableList<MageMeetsAddress> addresses = new SoapSerializableList<MageMeetsAddress>();
                 addresses.add((MageMeetsAddress) billingAddress);
                 addresses.add((MageMeetsAddress) shippingAddress);
 
@@ -265,7 +265,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
             @Override
             public Map<String, Object> buildParams() {
                 // Create a list with the product we want to add to cart
-                Serializable.List<Item> cartItemsToSend = new Serializable.List<Item>();
+                SoapSerializableList<Item> cartItemsToSend = new SoapSerializableList<Item>();
                 cartItemsToSend.addAll(items);
                 // Create the params and call the method
                 Map<String, Object> params = new HashMap<String, Object>();
@@ -364,7 +364,7 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
                 @Override
                 public Map<String, Object> buildParams() {
                     // Create a list with the product we want to add to cart
-                    Serializable.List<Item> cartItemsToSend = new Serializable.List<Item>();
+                    SoapSerializableList<Item> cartItemsToSend = new SoapSerializableList<Item>();
                     cartItemsToSend.addAll(removedItems);
                     // Create the params and call the method
                     Map<String, Object> params = new HashMap<String, Object>();

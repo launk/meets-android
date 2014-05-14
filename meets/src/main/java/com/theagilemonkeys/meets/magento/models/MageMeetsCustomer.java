@@ -15,7 +15,8 @@ import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsAddress;
 import com.theagilemonkeys.meets.models.MeetsCustomer;
 import com.theagilemonkeys.meets.utils.StringUtils;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableList;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableMap;
 
 import org.jdeferred.Deferred;
 import org.jdeferred.DoneCallback;
@@ -123,27 +124,25 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
 
     @Override
     public MeetsAddress getDefaultBillingAddress() {
-        if (addresses != null && addresses.size() > 0) {
-            for (MeetsAddress address : addresses){
-                if ( address.isDefaultBilling() ) return address;
-            }
+        for (MeetsAddress address : getAddresses()){
+            if ( address.isDefaultBilling() ) return address;
         }
         return null;
     }
 
     @Override
     public MeetsAddress getDefaultShippingAddress() {
-        if (addresses != null && addresses.size() > 0) {
-            for (MeetsAddress address : addresses){
-                if ( address.isDefaultShipping() ) return address;
-            }
+        for (MeetsAddress address : getAddresses()){
+            if ( address.isDefaultShipping() ) return address;
         }
         return null;
     }
 
     @Override
     public List<MeetsAddress> getAddresses() {
-        return addresses == null? new ArrayList<MeetsAddress>() : addresses;
+        if (addresses == null)
+            addresses = new ArrayList<MeetsAddress>();
+        return addresses;
     }
 
     private MeetsCustomer create() {
@@ -197,18 +196,18 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
         ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
             @Override
             public Map<String, Object> buildParams() {
-                List<Map<String, Object>> complexFilter = new Serializable.List<Map<String, Object>>();
+                List<Map<String, Object>> complexFilter = new SoapSerializableList<Map<String, Object>>();
                     //Email filter key
-                    Map<String, Object> filter = new Serializable.Map<String, Object>();
+                    Map<String, Object> filter = new SoapSerializableMap<String, Object>();
                         //Email filter value
-                        Map<String, Object> filterValue = new Serializable.Map<String, Object>();
+                        Map<String, Object> filterValue = new SoapSerializableMap<String, Object>();
                         filterValue.put("key", "eq");
                         filterValue.put("value", email);
                     filter.put("key", "email");
                     filter.put("value", filterValue);
                 complexFilter.add(filter);
 
-                Map<String, Object> filters = new Serializable.Map<String, Object>();
+                Map<String, Object> filters = new SoapSerializableMap<String, Object>();
                 filters.put("complex_filter", complexFilter);
 
                 Map<String, Object> params = new HashMap<String, Object>();
@@ -304,7 +303,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                     public void onDone(Object o) {
                         meetsAddress.setId(((MeetsAddress)o).getId());
                         refreshAddressesAfterSave(meetsAddress);
-                        addresses.add(meetsAddress);
+                        getAddresses().add(meetsAddress);
                     }
                 })
                 .always(triggerListeners);
@@ -314,14 +313,14 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
     @Override
     public MeetsCustomer removeAddress(final int addressId) {
         int indexToRemove = -1;
-        for(int i = 0; i < addresses.size(); ++i) {
-            if (addresses.get(i).getId() == addressId) {
+        for(int i = 0; i < getAddresses().size(); ++i) {
+            if (getAddresses().get(i).getId() == addressId) {
                 indexToRemove = i;
                 break;
             }
         }
         if (indexToRemove >= 0) {
-            final MeetsAddress addressToRemove = addresses.remove(indexToRemove);
+            final MeetsAddress addressToRemove = getAddresses().remove(indexToRemove);
             final int finalIndexToRemove = indexToRemove;
 
             ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
@@ -338,7 +337,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                     .fail(new FailCallback() {
                         @Override
                         public void onFail(Object result) {
-                            addresses.add(finalIndexToRemove, addressToRemove);
+                            getAddresses().add(finalIndexToRemove, addressToRemove);
                         }
                     })
                     .always(triggerListeners);
@@ -347,7 +346,7 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
     }
 
     private void refreshAddressesAfterSave(MeetsAddress savedAddress) {
-        for (MeetsAddress address : addresses) {
+        for (MeetsAddress address : getAddresses()) {
             if (address.getId() == savedAddress.getId()) {
                 address.shallowCopyFrom(savedAddress);
             }

@@ -5,7 +5,7 @@ import com.theagilemonkeys.meets.ApiMethodModelHelper;
 import com.theagilemonkeys.meets.models.base.MeetsListener;
 import com.theagilemonkeys.meets.models.base.MeetsModel;
 import com.theagilemonkeys.meets.utils.Copier;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableObject;
 
 import org.jdeferred.AlwaysCallback;
 import org.jdeferred.Deferred;
@@ -22,7 +22,7 @@ import java.util.Map;
  *
  * @author Álvaro López Espinosa
  */
-public abstract class MageMeetsModel<MODEL extends MeetsModel> extends Serializable.Object implements MeetsModel<MODEL> {
+public abstract class MageMeetsModel<MODEL extends MeetsModel> extends SoapSerializableObject implements MeetsModel<MODEL> {
     private transient ApiMethodModelHelper<MODEL> apiMethodCtrl = new ApiMethodModelHelper<MODEL>((MODEL) this);
 
     @Override

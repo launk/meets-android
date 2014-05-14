@@ -1,8 +1,8 @@
 package com.theagilemonkeys.meets.models;
 
 import com.theagilemonkeys.meets.models.base.MeetsModel;
+import com.theagilemonkeys.meets.utils.MeetsSerializable;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +30,7 @@ public interface MeetsProduct extends MeetsModel<MeetsProduct> {
     MeetsProduct setConfiguration(Configuration configuration);
     Configuration getConfiguration();
 
-    public interface ConfigurationsData extends Serializable {
+    public interface ConfigurationsData extends MeetsSerializable {
         List<Attribute> getAttributes();
         Attribute getAttribute(int attributeId);
         Attribute.Option getOption(int attributeId, int optionId);
@@ -38,17 +38,17 @@ public interface MeetsProduct extends MeetsModel<MeetsProduct> {
         double calculateTotalPrice(double basePrice, Configuration configuration);
     }
 
-    public interface Configuration extends Serializable{
+    public interface Configuration extends MeetsSerializable {
         Map<Integer, Integer> getAttributeOptionMap();
         int getStock();
     }
 
-    public interface Attribute extends Serializable {
+    public interface Attribute extends MeetsSerializable {
         int getId();
         String getLabel();
         List<Option> getOptions();
 
-        public interface Option extends Serializable {
+        public interface Option extends MeetsSerializable {
             int getId();
             String getLabel();
             double getPriceOffset();

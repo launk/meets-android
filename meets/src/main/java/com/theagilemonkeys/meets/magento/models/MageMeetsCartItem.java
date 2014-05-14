@@ -6,7 +6,8 @@ import com.theagilemonkeys.meets.magento.methods.Products;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsCart;
 import com.theagilemonkeys.meets.models.MeetsProduct;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableList;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableMap;
 
 import org.jdeferred.DoneCallback;
 
@@ -32,7 +33,7 @@ public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements
     @Key private String name;
     @Key private String description;
     @Key private double price;
-    @Key private Serializable.List<Serializable.Map<String, String>> super_attribute;
+    @Key private SoapSerializableList<SoapSerializableMap<String, String>> super_attribute;
 
     private MeetsProduct.Configuration configuration;
     private MeetsProduct relatedProduct;
@@ -54,9 +55,9 @@ public class MageMeetsCartItem extends MageMeetsModel<MeetsCart.Item> implements
         if("configurable".equals(product_type)) {
             configuration = product.getConfiguration();
             if(configuration == null) return;
-            super_attribute = new Serializable.List<Serializable.Map<String, String>>();
+            super_attribute = new SoapSerializableList<SoapSerializableMap<String, String>>();
             for(Map.Entry<Integer, Integer> entry : configuration.getAttributeOptionMap().entrySet()) {
-                Serializable.Map<String, String> option = new Serializable.Map<String, String>();
+                SoapSerializableMap<String, String> option = new SoapSerializableMap<String, String>();
                 option.put("key", String.valueOf(entry.getKey()));
                 option.put("value", String.valueOf(entry.getValue()));
                 super_attribute.add(option);

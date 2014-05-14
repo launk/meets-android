@@ -1,12 +1,10 @@
 package com.theagilemonkeys.meets.magento.models;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.api.client.util.Key;
 import com.theagilemonkeys.meets.models.MeetsProduct;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableObject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,18 +14,16 @@ import java.util.Map;
  *
  * @author Álvaro López Espinosa
  */
-@JsonAutoDetect(
-        fieldVisibility = JsonAutoDetect.Visibility.ANY,
-        getterVisibility = JsonAutoDetect.Visibility.NONE,
-        isGetterVisibility = JsonAutoDetect.Visibility.NONE,
-        setterVisibility = JsonAutoDetect.Visibility.NONE
-)
-public class MageMeetsProductConfigurationsData extends Serializable.Object implements MeetsProduct.ConfigurationsData {
+// This annotation is needed to allow deserialize objects of this class when they don't have
+// type info, as when they come from server
+@JsonTypeInfo(use= JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="class", defaultImpl = MageMeetsProductConfigurationsData.class)
+public class MageMeetsProductConfigurationsData extends SoapSerializableObject implements MeetsProduct.ConfigurationsData {
     @Key
-    @JsonDeserialize(as = ArrayList.class, contentAs = MageMeetsProductAttribute.class)
+    @JsonTypeInfo(use= JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="class", defaultImpl = MageMeetsProductAttribute.class)
     List<MeetsProduct.Attribute> attributes;
+
     @Key
-    @JsonDeserialize(as = ArrayList.class, contentAs = MageMeetsProductConfiguration.class)
+    @JsonTypeInfo(use= JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="class", defaultImpl = MageMeetsProductConfiguration.class)
     List<MeetsProduct.Configuration> products;
 
     @Override

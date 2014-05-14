@@ -9,10 +9,10 @@ import org.jdeferred.FailPipe;
 import org.jdeferred.Promise;
 import org.jdeferred.impl.DeferredObject;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Android Meets SDK
@@ -24,7 +24,7 @@ public class ApiMethodModelHelper<MODEL> implements ApiMethodModelHelperInterfac
     static MeetsListener globalListener = new MeetsListener.Empty();
 
     boolean ignoreGlobalListener = false;
-    protected transient Map<MeetsListener<MODEL>, Boolean> listenersWithKeepInfo = new HashMap<MeetsListener<MODEL>, Boolean>();
+    protected transient Map<MeetsListener<MODEL>, Boolean> listenersWithKeepInfo = new ConcurrentHashMap<MeetsListener<MODEL>, Boolean>();
     protected transient Deferred masterPromise = new DeferredObject().resolve(this);
     private boolean serially = false;
     private Boolean forceNextCacheEnable = null;

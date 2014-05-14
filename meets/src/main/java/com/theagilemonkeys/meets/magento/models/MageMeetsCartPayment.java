@@ -2,7 +2,7 @@ package com.theagilemonkeys.meets.magento.models;
 
 import com.google.api.client.util.Key;
 import com.theagilemonkeys.meets.models.MeetsCart;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableObject;
 
 /**
  * Android Meets SDK
@@ -10,7 +10,7 @@ import com.theagilemonkeys.meets.utils.soap.Serializable;
  *
  * @author Álvaro López Espinosa
  */
-public class MageMeetsCartPayment extends Serializable.Object implements MeetsCart.Payment {
+public class MageMeetsCartPayment extends SoapSerializableObject implements MeetsCart.Payment {
 
     @Key private String title;
     @Key private String po_number;

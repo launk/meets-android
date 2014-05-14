@@ -1,8 +1,8 @@
 package com.theagilemonkeys.meets.models;
 
 import com.theagilemonkeys.meets.models.base.MeetsModel;
+import com.theagilemonkeys.meets.utils.MeetsSerializable;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -68,7 +68,7 @@ public interface MeetsCart extends MeetsModel<MeetsCart> {
         Item fetchRelatedProduct();
     }
 
-    interface Payment extends Serializable {
+    interface Payment extends MeetsSerializable {
         String getTitle();
         String getCode();
         Payment setCode(String methodCode);
@@ -82,7 +82,7 @@ public interface MeetsCart extends MeetsModel<MeetsCart> {
         Payment setPaymentToken(String token);
     }
 
-    interface Shipping extends Serializable {
+    interface Shipping extends MeetsSerializable {
         String getCarrierCode();
         String getCarrierTitle();
         String getCode();

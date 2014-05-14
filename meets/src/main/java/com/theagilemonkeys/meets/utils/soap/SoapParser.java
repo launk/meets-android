@@ -49,13 +49,6 @@ public class SoapParser {
             String.class, Byte.class, Short.class, Integer.class, Long.class,
             Float.class, Double.class, Boolean.class, BigInteger.class, BigDecimal.class
     );
-//
-//    /**
-//     * A list with all decimal types which are incompatible with Soap and are sent as Strings
-//     */
-//    private static final List decimalTypes = Arrays.asList(
-//            Float.class, Double.class, double.class, float.class
-//    );
 
     /**
      * Parse a SoapObject into any object.
@@ -79,20 +72,6 @@ public class SoapParser {
             parseObject(in, out);
         }
     }
-
-//    public static Map<String,Object> parseAsMap(SoapObject in){
-//        int n = in.getPropertyCount();
-//        for (int i = 0; i < n; ++i) {
-//            PropertyInfo propInfo = new PropertyInfo();
-//            in.getPropertyInfo(i, propInfo);
-//
-//            Object prop = in.getProperty(i);
-//            int i = 0;
-//             i = 9;
-//
-//        }
-//        return null;
-//    }
 
     private static Object getPrimitiveValue(Class valueClass, Object value) {
         if ( valueClass == Float.class || valueClass == float.class ){

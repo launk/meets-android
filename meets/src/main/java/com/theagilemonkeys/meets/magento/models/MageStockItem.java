@@ -2,7 +2,7 @@ package com.theagilemonkeys.meets.magento.models;
 
 import com.google.api.client.util.Key;
 import com.theagilemonkeys.meets.models.MeetsStock;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableObject;
 
 /**
  * Android Meets SDK
@@ -10,7 +10,7 @@ import com.theagilemonkeys.meets.utils.soap.Serializable;
  *
  * @author Álvaro López Espinosa
  */
-public class MageStockItem extends Serializable.Object implements MeetsStock.Item {
+public class MageStockItem extends SoapSerializableObject implements MeetsStock.Item {
 
 
     @Key private String product_id;

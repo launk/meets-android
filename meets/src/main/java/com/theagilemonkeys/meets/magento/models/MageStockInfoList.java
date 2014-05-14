@@ -4,7 +4,7 @@ import com.theagilemonkeys.meets.ApiMethodModelHelper;
 import com.theagilemonkeys.meets.magento.methods.CatalogInventoryStockItemList;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
 import com.theagilemonkeys.meets.models.MeetsStock;
-import com.theagilemonkeys.meets.utils.soap.Serializable;
+import com.theagilemonkeys.meets.utils.soap.SoapSerializableList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import java.util.Map;
  * @author Álvaro López Espinosa
  */
 public class MageStockInfoList extends MageMeetsModel<MeetsStock.ItemList> implements MeetsStock.ItemList {
-    private Serializable.List<Integer> idsList = new Serializable.List<Integer>();
+    private SoapSerializableList<Integer> idsList = new SoapSerializableList<Integer>();
     private List<MeetsStock.Item> stockInfoList;
 
 
@@ -47,14 +47,14 @@ public class MageStockInfoList extends MageMeetsModel<MeetsStock.ItemList> imple
 
     @Override
     public MeetsStock.ItemList setId(int id) {
-        idsList = new Serializable.List<Integer>();
+        idsList = new SoapSerializableList<Integer>();
         idsList.add(id);
         return this;
     }
 
     @Override
     public MeetsStock.ItemList setIds(List<Integer> ids) {
-        idsList = new Serializable.List<Integer>();
+        idsList = new SoapSerializableList<Integer>();
         idsList.addAll(ids);
         return this;
     }

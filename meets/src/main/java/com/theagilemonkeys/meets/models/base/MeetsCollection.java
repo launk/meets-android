@@ -1,10 +1,8 @@
 package com.theagilemonkeys.meets.models.base;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.theagilemonkeys.meets.ApiMethodModelHelperInterface;
+import com.theagilemonkeys.meets.utils.MeetsSerializable;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -13,14 +11,7 @@ import java.util.Map;
  *
  * @author Álvaro López Espinosa
  */
-@JsonTypeInfo(use= JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="class")
-@JsonAutoDetect(
-        fieldVisibility = JsonAutoDetect.Visibility.ANY,
-        getterVisibility = JsonAutoDetect.Visibility.NONE,
-        isGetterVisibility = JsonAutoDetect.Visibility.NONE,
-        setterVisibility = JsonAutoDetect.Visibility.NONE
-)
-public interface MeetsCollection<MODEL> extends ApiMethodModelHelperInterface<MeetsCollection<MODEL>>, Serializable {
+public interface MeetsCollection<MODEL> extends ApiMethodModelHelperInterface<MeetsCollection<MODEL>>, MeetsSerializable {
     /**
      * Fetch a new bunch of models from the server, using page, pageSize and any extra filters
      * set with setFilters. It can trigger any of these events (and in that specific order):
