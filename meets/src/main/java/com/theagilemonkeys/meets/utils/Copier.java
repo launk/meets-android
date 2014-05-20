@@ -1,6 +1,7 @@
 package com.theagilemonkeys.meets.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,11 +55,11 @@ public class Copier {
         List<Field> dstFields = getAllFields(dst.getClass());
 
         try{
-            for(Field field : src.getClass().getDeclaredFields()){
+            for(Field field : getAllFields(src.getClass()) ) {
                 field.setAccessible(true);
                 Object value = field.get(src);
 
-                if ( ignoreFieldValue(value) ) continue;
+                if ( ignoreFieldValue(field, value) ) continue;
                 if ( ! dstFields.contains(field) ) continue;
 
                 field.set(dst, value);
@@ -70,7 +71,13 @@ public class Copier {
         return this;
     }
 
-    private boolean ignoreFieldValue(Object value) {
+    private boolean ignoreFieldValue(Field field, Object value) {
+        int modifiers = field.getModifiers();
+        if (Modifier.isStatic(modifiers) ||
+            Modifier.isTransient(modifiers))
+            return true;
+
+
         if (ignoreNulls && value == null) return true;
 
         for ( Class ignoredClassTree : ignoreInstancesOf ){

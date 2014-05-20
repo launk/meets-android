@@ -32,7 +32,7 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
     /////// Static global configuration. These values are used for all methods by default //////
 
     /////// CACHE ////////
-    public static final AtomicLong globalCacheDuration = new AtomicLong(DurationInMillis.ONE_SECOND);
+    public static final AtomicLong globalCacheDuration = new AtomicLong(DurationInMillis.ONE_HOUR);
     public static final AtomicBoolean globalAlwaysGetFromCacheFirst = new AtomicBoolean(true);
 
     /////// FIXED PARAMS //////

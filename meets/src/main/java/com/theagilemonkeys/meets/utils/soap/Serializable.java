@@ -33,7 +33,7 @@ public class Serializable {
 
     public static class Object implements KvmSerializable {
         private static final java.util.List unserializableTypes = Arrays.asList(Float.class, float.class, Double.class, double.class);
-        private java.util.List<Field> fields = null;
+        private transient java.util.List<Field> fields = null;
 
         private java.util.List<Field> getFields(){
             if (fields != null) return fields;
@@ -101,7 +101,7 @@ public class Serializable {
     }
 
     public static class List<TYPE> extends ArrayList<TYPE> implements KvmSerializable {
-        protected String listItemName = "item";
+        protected transient String listItemName = "item";
 
         public List() {}
 
@@ -132,8 +132,8 @@ public class Serializable {
     }
 
     public static class Map<KEY_TYPE, VALUE_TYPE> extends LinkedHashMap<KEY_TYPE, VALUE_TYPE> implements KvmSerializable {
-        private java.util.List<VALUE_TYPE> values = null;
-        private java.util.List<KEY_TYPE> keys = null;
+        private transient java.util.List<VALUE_TYPE> values = null;
+        private transient java.util.List<KEY_TYPE> keys = null;
 
         private java.util.List<VALUE_TYPE> getMapValues(){
             if (values != null) return values;
