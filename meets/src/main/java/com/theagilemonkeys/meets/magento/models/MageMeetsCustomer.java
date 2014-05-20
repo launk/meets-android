@@ -1,12 +1,14 @@
 package com.theagilemonkeys.meets.magento.models;
 
 import com.google.api.client.util.Key;
+import com.theagilemonkeys.meets.ApiMethod;
 import com.theagilemonkeys.meets.ApiMethodModelHelper;
 import com.theagilemonkeys.meets.Meets;
 import com.theagilemonkeys.meets.magento.MageApiMethodCollectionResponseClasses;
 import com.theagilemonkeys.meets.magento.methods.CustomerAddressCreate;
 import com.theagilemonkeys.meets.magento.methods.CustomerAddressDelete;
 import com.theagilemonkeys.meets.magento.methods.CustomerAddressList;
+import com.theagilemonkeys.meets.magento.methods.CustomerAddressUpdate;
 import com.theagilemonkeys.meets.magento.methods.CustomerCustomerCreate;
 import com.theagilemonkeys.meets.magento.methods.CustomerCustomerInfo;
 import com.theagilemonkeys.meets.magento.methods.CustomerCustomerList;
@@ -280,30 +282,42 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
 
     @Override
     public MeetsCustomer saveAddress(final MeetsAddress meetsAddress) {
-        if( ! meetsAddress.isNew() ) {
-            ((MageMeetsAddress) meetsAddress).save();
-            refreshAddressesAfterSave(meetsAddress);
-            return this;
+        ApiMethodModelHelper.DelayedParams params;
+        ApiMethod method;
+        if ( meetsAddress.isNew() ) {
+            // We have to create the address
+            params = new ApiMethodModelHelper.DelayedParams() {
+                @Override
+                public Map<String, Object> buildParams() {
+                    Map<String, Object> params = new HashMap<String, Object>();
+                    params.put("customerId", getId());
+                    params.put("addressData", meetsAddress);
+                    return params;
+                }
+            };
+            method = new CustomerAddressCreate();
+        }
+        else {
+            params = new ApiMethodModelHelper.DelayedParams() {
+                @Override
+                public Map<String, Object> buildParams() {
+                    Map<String, Object> params = new HashMap<String, Object>();
+                    params.put("addressId", meetsAddress.getId());
+                    params.put("addressData", meetsAddress);
+                    return params;
+                }
+            };
+            method = new CustomerAddressUpdate();
         }
 
-        ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
-            @Override
-            public Map<String, Object> buildParams() {
-                Map<String, Object> params = new HashMap<String, Object>();
-                params.put("customerId", getId());
-                params.put("addressData", meetsAddress);
-                return params;
-            }
-        };
-
         forceNextCacheToBe(false);
-        pushMethod(new CustomerAddressCreate(), params)
+        pushMethod(method, params)
                 .done(new DoneCallback() {
                     @Override
                     public void onDone(Object o) {
-                        meetsAddress.setId(((MeetsAddress)o).getId());
+                        if (o instanceof MeetsAddress)
+                            meetsAddress.setId(((MeetsAddress)o).getId());
                         refreshAddressesAfterSave(meetsAddress);
-                        getAddresses().add(meetsAddress);
                     }
                 })
                 .always(triggerListeners);
@@ -346,9 +360,11 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
     }
 
     private void refreshAddressesAfterSave(MeetsAddress savedAddress) {
-        for (MeetsAddress address : getAddresses()) {
+        boolean addressIsNew = true;
+        for (MeetsAddress address : addresses) {
             if (address.getId() == savedAddress.getId()) {
                 address.shallowCopyFrom(savedAddress);
+                addressIsNew = false;
             }
             else {
                 if (savedAddress.isDefaultBilling() && address.isDefaultBilling())
@@ -357,6 +373,8 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
                     address.setDefaultShipping(false);
             }
         }
+        if (addressIsNew)
+            addresses.add(savedAddress);
     }
 
     @Override

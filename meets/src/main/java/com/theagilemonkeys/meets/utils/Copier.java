@@ -72,15 +72,15 @@ public class Copier {
     }
 
     private boolean ignoreFieldValue(Field field, Object value) {
+        int modifiers = field.getModifiers();
+        if ( Modifier.isTransient(modifiers) || Modifier.isStatic(modifiers) )
+            return true;
+
         if (ignoreNulls && value == null) return true;
 
         for ( Class ignoredClassTree : ignoreInstancesOf ){
             if ( ignoredClassTree.isInstance(value) ) return true;
         }
-
-        int modifiers = field.getModifiers();
-        if ( Modifier.isTransient(modifiers) || Modifier.isStatic(modifiers) )
-            return true;
 
         return false;
     }

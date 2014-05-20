@@ -97,8 +97,10 @@ public class MageMeetsCollection<MODEL extends MeetsModel> extends ArrayList<MOD
     @Override
     public MeetsCollection<MODEL> reset() {
         // We have to extract models manually to trigger events
-        for (MeetsModel meetsModel : this){
-            extract(meetsModel.getId());
+        // (Note that if we use iterators we'll get a ConcurrentModification exception,
+        // so use a reverse for loop)
+        for (int i = getSize() - 1; i >= 0 ; --i) {
+            extract(get(i).getId());
         }
         // Trigger MeetsCollection specific listeners
         Map<MeetsListener<MeetsCollection<MODEL>>, Boolean> listeners = apiMethodCtrl.getListenersWithKeepInfo();

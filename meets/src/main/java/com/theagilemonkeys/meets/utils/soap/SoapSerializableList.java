@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 
 public class SoapSerializableList<TYPE> extends ArrayList<TYPE> implements KvmSerializable {
-    protected String listItemName = "item";
+    protected transient String listItemName = "item";
 
     public SoapSerializableList() {}
 

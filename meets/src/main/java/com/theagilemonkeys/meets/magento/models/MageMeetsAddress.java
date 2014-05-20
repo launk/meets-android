@@ -2,7 +2,6 @@ package com.theagilemonkeys.meets.magento.models;
 
 import com.google.api.client.util.Key;
 import com.theagilemonkeys.meets.ApiMethodModelHelper;
-import com.theagilemonkeys.meets.magento.methods.CustomerAddressDelete;
 import com.theagilemonkeys.meets.magento.methods.CustomerAddressInfo;
 import com.theagilemonkeys.meets.magento.methods.CustomerAddressUpdate;
 import com.theagilemonkeys.meets.magento.models.base.MageMeetsModel;
@@ -178,21 +177,6 @@ public class MageMeetsAddress extends MageMeetsModel<MeetsAddress> implements Me
 
         forceNextCacheToBe(false);
         pushMethod(new CustomerAddressUpdate(), params).always(triggerListeners);
-        return this;
-    }
-
-    MeetsAddress remove() {
-        ApiMethodModelHelper.DelayedParams params = new ApiMethodModelHelper.DelayedParams() {
-            @Override
-            public Map<String, Object> buildParams() {
-                Map<String, Object> params = new HashMap<String, Object>();
-                params.put("addressId", getId());
-                return params;
-            }
-        };
-
-        forceNextCacheToBe(false);
-        pushMethod(new CustomerAddressDelete(), params).always(triggerListeners);
         return this;
     }
 

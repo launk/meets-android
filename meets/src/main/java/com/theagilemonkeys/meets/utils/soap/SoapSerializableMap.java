@@ -8,8 +8,8 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 
 public class SoapSerializableMap<KEY_TYPE, VALUE_TYPE> extends LinkedHashMap<KEY_TYPE, VALUE_TYPE> implements KvmSerializable {
-    private java.util.List<VALUE_TYPE> values = null;
-    private java.util.List<KEY_TYPE> keys = null;
+    private transient java.util.List<VALUE_TYPE> values = null;
+    private transient java.util.List<KEY_TYPE> keys = null;
 
     private java.util.List<VALUE_TYPE> getMapValues(){
         if (values != null) return values;

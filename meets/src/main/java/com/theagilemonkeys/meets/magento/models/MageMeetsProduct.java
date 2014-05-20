@@ -33,11 +33,12 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     @Key private String image_url;
     @Key private Double final_price_with_tax;
     @Key private String price;
-    private List<MeetsProduct> associatedProducs;
-    private List<String> images;
-    private ConfigurationsData configurationData;
-    private Configuration configuration;
-    private List<Attribute> attributes;
+
+    private transient List<MeetsProduct> associatedProducs;
+    private transient List<String> images;
+    private transient List<Attribute> attributes;
+    private transient ConfigurationsData configurationData;
+    private transient Configuration configuration;
 
     @Override
     public MeetsProduct fetch() {
