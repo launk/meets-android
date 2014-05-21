@@ -497,7 +497,6 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
             }
         };
 
-        forceNextCacheToBe(true);
         pushMethod(new ShoppingCartShippingList(), params)
                 .done(new DoneCallback() {
                     @Override
@@ -520,7 +519,6 @@ public class MageMeetsCart extends MageMeetsModel<MeetsCart> implements MeetsCar
             }
         };
 
-        forceNextCacheToBe(true);
         pushMethod(new ShoppingCartPaymentList(), params)
                 .done(new DoneCallback() {
                     @Override
