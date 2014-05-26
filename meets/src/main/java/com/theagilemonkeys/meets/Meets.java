@@ -39,9 +39,8 @@ public class Meets {
         SoapApiMethod.soapApiUser = soapApiUser;
         SoapApiMethod.soapApiPass = soapApiPass;
 
-        RestApiMethod.baseUrl = hostUrl.replaceAll("/$", "") + restBaseUrl;
-        SoapApiMethod.baseUrl = hostUrl.replaceAll("/$", "") + soapBaseUrl;
-        SoapApiMethod.soapNamespace = hostUrl.replaceAll("/$", "") + soapWsdl;
+        setRestHostUrl(hostUrl);
+        setSoapHostUrl(hostUrl);
     }
 
     public static void init(Context applicationContext, MeetsFactory factory, String hostUrl, String soapApiUser, String soapApiPassword,
@@ -60,6 +59,29 @@ public class Meets {
         init(applicationContext, factory, hostUrl, soapApiUser, soapApiPass, storeId, websiteId);
         RestApiMethod.setBasicAuth(basicAuthUser, basicAuthPassword);
         SoapApiMethod.setBasicAuth(basicAuthUser, basicAuthPassword);
+    }
+
+    public static void init(Context applicationContext, MeetsFactory factory, String restHostUrl, String soapHostUrl, String soapApiUser, String soapApiPass,
+                            int storeId, int websiteId, String basicAuthUser, String basicAuthPassword) {
+        init(applicationContext, factory, restHostUrl, soapApiUser, soapApiPass, storeId, websiteId, basicAuthUser, basicAuthPassword);
+        setSoapHostUrl(soapHostUrl);
+    }
+
+    /**
+     * Allow you to set a different url for rest calls (i.e. a proxy)
+     * @param restHostUrl The rest host url
+     */
+    public static void setRestHostUrl(String restHostUrl) {
+        RestApiMethod.baseUrl = restHostUrl.replaceAll("/$", "") + restBaseUrl;
+    }
+
+    /**
+     * Allow you to set a different url for soap calls (i.e. a proxy)
+     * @param soapHostUrl The soap host url
+     */
+    public static void setSoapHostUrl(String soapHostUrl) {
+        SoapApiMethod.baseUrl = soapHostUrl.replaceAll("/$", "") + soapBaseUrl;
+        SoapApiMethod.soapNamespace = soapHostUrl.replaceAll("/$", "") + soapWsdl;
     }
 
     /**
