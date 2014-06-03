@@ -114,6 +114,18 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
     public Deferred run(Map<String, Object> params, List<String> urlExtraSegments){
         runDeferred = new DeferredObject();
 
+        prepareParams(params, urlExtraSegments);
+        makeRequest();
+
+        return runDeferred;
+    }
+
+    public RESULT syncRun(Map<String, Object> params, List<String> urlExtraSegments) throws Exception {
+        prepareParams(params, urlExtraSegments);
+        return loadDataFromNetwork();
+    }
+
+    private void prepareParams(Map<String, Object> params, List<String> urlExtraSegments) {
         this.params = new TreeMap(String.CASE_INSENSITIVE_ORDER);
         this.params.putAll(fixedParams);
         if (params != null)
@@ -122,10 +134,6 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
         this.urlExtraSegments = new ArrayList<String>(fixedUrlExtraSegments);
         if (urlExtraSegments != null)
             this.urlExtraSegments.addAll(urlExtraSegments);
-
-        makeRequest();
-
-        return runDeferred;
     }
 
     private void makeRequest() {

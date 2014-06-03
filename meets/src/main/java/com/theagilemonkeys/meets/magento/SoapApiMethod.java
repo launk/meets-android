@@ -94,7 +94,6 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
         }
     }
 
-
     private Object send(String method, Map<String, Object> params) throws IOException, XmlPullParserException {
         HttpTransportSE httpTransport = new HttpTransportSE(baseUrl,timeout);
         SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
