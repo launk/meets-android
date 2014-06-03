@@ -27,49 +27,29 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Álvaro López Espinosa
  */
-public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RESULT> implements RequestListener<RESULT> {
+public abstract class ApiMethod<RESULT> {
 
-    /////// Static global configuration. These values are used for all methods by default //////
+    protected volatile long cacheDuration = DurationInMillis.ONE_HOUR;
+    protected volatile boolean alwaysGetFromCacheFirst = true;
 
-    /////// CACHE ////////
-    public static final AtomicLong globalCacheDuration = new AtomicLong(DurationInMillis.ONE_HOUR);
-    public static final AtomicBoolean globalAlwaysGetFromCacheFirst = new AtomicBoolean(true);
-
-    /////// FIXED PARAMS //////
-    public static final Map<String,Object> fixedParams = Collections.synchronizedMap(new HashMap<String, Object>());
-    public static final List<String> fixedUrlExtraSegments = Collections.synchronizedList(new ArrayList<String>());
-
-    /////// BASIC AUTHORIZATION ///////
-    private static String basicAuthName;
-    private static String basicAuthPass;
-
-    public static synchronized void setBasicAuth(String name, String pass){
-        basicAuthName = name;
-        basicAuthPass = pass;
-    }
-    public static synchronized String getBasicAuthName() {
-        return basicAuthName;
-    }
-    public static synchronized String getBasicAuthPass() {
-        return basicAuthPass;
-    }
-
-    //////// Instance attributes and methods ///////
     protected List<String> urlExtraSegments;
     protected Map <String, Object> params;
     protected Class responseClass;
     protected Deferred runDeferred;
-    protected long cacheDuration = globalCacheDuration.get();
-    protected boolean alwaysGetFromCacheFirst = globalAlwaysGetFromCacheFirst.get();
+    protected MeetsDefaultConfig config;
 
     public ApiMethod(Class<RESULT> responseClass) {
-        super(responseClass);
         this.responseClass = responseClass;
+        config = Meets.getConfig();
     }
 
     public ApiMethod<RESULT> setResponseClass(Class responseClass) {
         this.responseClass = responseClass;
         return this;
+    }
+
+    public Class<RESULT> getResponseClass() {
+        return responseClass;
     }
 
     /**
@@ -98,9 +78,11 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
         return this;
     }
 
-    public ApiMethod<RESULT> clearCache() {
-        Meets.spiceManager.removeAllDataFromCache();
-        return this;
+    public long getCacheDuration() {
+        return cacheDuration;
+    }
+    public boolean isAlwaysGetFromCacheFirst() {
+        return alwaysGetFromCacheFirst;
     }
 
     public Deferred run(String... urlExtraSegments) {
@@ -125,28 +107,7 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
         return loadDataFromNetwork();
     }
 
-    private void prepareParams(Map<String, Object> params, List<String> urlExtraSegments) {
-        this.params = new TreeMap(String.CASE_INSENSITIVE_ORDER);
-        this.params.putAll(fixedParams);
-        if (params != null)
-            this.params.putAll(params);
 
-        this.urlExtraSegments = new ArrayList<String>(fixedUrlExtraSegments);
-        if (urlExtraSegments != null)
-            this.urlExtraSegments.addAll(urlExtraSegments);
-    }
-
-    private void makeRequest() {
-        if (cacheDuration >= 0){
-            if (alwaysGetFromCacheFirst)
-                Meets.spiceManager.getFromCacheAndLoadFromNetworkIfExpired(this, getCacheKey(), cacheDuration, this);
-            else
-                Meets.spiceManager.execute(this, getCacheKey(), cacheDuration, this);
-        }
-        else {
-            Meets.spiceManager.execute(this, this);
-        }
-    }
 
     @Override
     public void onRequestFailure(SpiceException e) {
@@ -160,6 +121,21 @@ public abstract class ApiMethod<RESULT> extends GoogleHttpClientSpiceRequest<RES
         if(runDeferred.isPending()) {
             runDeferred.resolve(response);
         }
+    }
+
+    private void prepareParams(Map<String, Object> params, List<String> urlExtraSegments) {
+        this.params = new TreeMap(String.CASE_INSENSITIVE_ORDER);
+
+        this.params.put("store", config.getStoreId());
+        this.params.put("storeId", config.getStoreId());
+        this.params.put("storeView", config.getStoreId());
+
+        if (params != null)
+            this.params.putAll(params);
+
+        this.urlExtraSegments = new ArrayList<String>();
+        if (urlExtraSegments != null)
+            this.urlExtraSegments.addAll(urlExtraSegments);
     }
 
     public String getCacheKey(){

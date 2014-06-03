@@ -1,4 +1,4 @@
-package com.theagilemonkeys.meets;
+package com.theagilemonkeys.meets.request.robospice;
 
 import android.util.Log;
 

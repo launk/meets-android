@@ -1,11 +1,15 @@
 package com.theagilemonkeys.meets.magento;
 
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpResponse;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.theagilemonkeys.meets.ApiMethod;
+import com.theagilemonkeys.meets.utils.MeetsSerializable;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Android Meets SDK
@@ -30,25 +34,36 @@ public class RestApiMethod<RESULT> extends ApiMethod<RESULT> {
 
     @Override
     public RESULT loadDataFromNetwork() throws Exception {
-        HttpRequest request = getHttpRequestFactory().buildGetRequest( new GenericUrl(generateUrl()) );
+        URL url = new URL(generateUrl());
+        HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setAccept("application/json")
-                   .setContentType("application/json");
+        // Set headers
+        urlConn.setRequestProperty("Accept", "application/json");
+        urlConn.setRequestProperty("Content-Type", "application/json");
 
         String basicAuthName = getBasicAuthName();
         String basicAuthPass = getBasicAuthPass();
-        if (basicAuthName != null && basicAuthPass != null){
-            httpHeaders.setBasicAuthentication(basicAuthName, basicAuthPass);
+        if (basicAuthName != null && basicAuthPass != null) {
+            byte[] token = (basicAuthName + ":" + basicAuthPass).getBytes();
+            urlConn.setRequestProperty("Authorization", "Basic " + new String(Base64.encodeBase64(token)));
         }
 
-        HttpResponse response = request.setHeaders(httpHeaders)
-                                       .setParser(new JacksonFactory().createJsonObjectParser())
-                                       .execute();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.addMixInAnnotations(MeetsSerializable.class, MagentoDeserializerOptions.class);
 
-        Object res = response.parseAs(responseClass);
-
-        return (RESULT) res;
+        return (RESULT) mapper.readValue(urlConn.getInputStream(), responseClass);
     }
+}
+
+@JsonTypeInfo(use= JsonTypeInfo.Id.NONE)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(
+        fieldVisibility = JsonAutoDetect.Visibility.ANY,
+        getterVisibility = JsonAutoDetect.Visibility.NONE,
+        isGetterVisibility = JsonAutoDetect.Visibility.NONE,
+        setterVisibility = JsonAutoDetect.Visibility.NONE
+)
+interface MagentoDeserializerOptions {
+
 }
 
