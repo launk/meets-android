@@ -1,6 +1,8 @@
 package com.theagilemonkeys.meets;
 
 import com.theagilemonkeys.meets.models.base.MeetsFactory;
+import com.theagilemonkeys.meets.request.DefaultRequestWrapper;
+import com.theagilemonkeys.meets.request.RequestWrapper;
 
 /**
  * Android Meets SDK
@@ -12,11 +14,10 @@ import com.theagilemonkeys.meets.models.base.MeetsFactory;
 @SuppressWarnings("unchecked")
 public class MeetsDefaultConfig<CONFIG extends MeetsDefaultConfig> {
 
-    public static final String restPath = "/api/rest/";
-    public static final String soapPath = "/api/v2_soap/";
-    public static final String soapWsdlPath = "/api/v2_soap/?wsdl";
+    public static String restPath = "/api/rest/";
+    public static String soapPath = "/api/v2_soap/";
+    public static String soapWsdlPath = "/api/v2_soap/?wsdl";
 
-    private MeetsFactory factory;
     private String restBaseUrl;
     private String soapBaseUrl;
     private String soapWsdlUrl;
@@ -40,7 +41,7 @@ public class MeetsDefaultConfig<CONFIG extends MeetsDefaultConfig> {
     // Getters
 
     public MeetsFactory getFactory() {
-        return factory;
+        return MeetsFactory.get();
     }
 
     public String getRestBaseUrl() {
@@ -81,7 +82,7 @@ public class MeetsDefaultConfig<CONFIG extends MeetsDefaultConfig> {
     // Setters
 
     public CONFIG setFactory(MeetsFactory factory) {
-        this.factory = factory;
+        MeetsFactory.setInstance(factory);
         return (CONFIG) this;
     }
 
@@ -124,5 +125,9 @@ public class MeetsDefaultConfig<CONFIG extends MeetsDefaultConfig> {
         basicAuthName = name;
         basicAuthPass = pass;
         return (CONFIG) this;
+    }
+
+    public<RESULT> RequestWrapper<RESULT> getRequestWrapper(ApiMethod<RESULT> method) {
+        return new DefaultRequestWrapper<RESULT>(method);
     }
 }

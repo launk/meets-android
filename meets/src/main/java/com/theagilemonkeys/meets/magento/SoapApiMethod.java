@@ -1,7 +1,5 @@
 package com.theagilemonkeys.meets.magento;
 
-import android.util.Log;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theagilemonkeys.meets.ApiMethod;
@@ -16,6 +14,8 @@ import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -32,16 +32,11 @@ import java.util.Map;
  */
 public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
     private static final String TAG = "----> SoapApiMethod";
+    final protected Logger logger = LoggerFactory.getLogger(SoapApiMethod.class);
     private static String apiSessionId;
     private static final Object lock = new Object();
 
     public static final String API_SESSION_EXPIRED_FAULTCODE = "5";
-
-    //These properties need to be configured on app init
-    public static String baseUrl;
-    public static String soapApiUser;
-    public static String soapApiPass;
-    public static String soapNamespace;
 
     public static int timeout = 1 * 60 * 1000; // 1 minute timeout
 
@@ -63,7 +58,7 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
 
     @Override
     protected String getBaseUrl() {
-        return baseUrl;
+        return config.getSoapBaseUrl();
     }
 
     protected void parseResponse(Object response, RESULT model) throws Exception {
@@ -95,14 +90,14 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
     }
 
     private Object send(String method, Map<String, Object> params) throws IOException, XmlPullParserException {
-        HttpTransportSE httpTransport = new HttpTransportSE(baseUrl,timeout);
+        HttpTransportSE httpTransport = new HttpTransportSE(config.getSoapBaseUrl(),timeout);
         SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
         soapEnvelope.implicitTypes = true;
         soapEnvelope.dotNet = false;
         soapEnvelope.xsd = SoapSerializationEnvelope.XSD;
         soapEnvelope.enc = SoapSerializationEnvelope.ENC;
 
-        SoapObject request = new SoapObject(soapNamespace, method);
+        SoapObject request = new SoapObject(config.getSoapWsdlUrl(), method);
 
         if (params == null)
             params = new HashMap<String, Object>();
@@ -123,8 +118,8 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
         soapEnvelope.setOutputSoapObject(request);
 
         List<HeaderProperty> headerList = new ArrayList<HeaderProperty>();
-        String basicAuthName = getBasicAuthName();
-        String basicAuthPass = getBasicAuthPass();
+        String basicAuthName = config.getBasicAuthName();
+        String basicAuthPass = config.getBasicAuthPass();
         if (basicAuthName != null && basicAuthPass != null) {
             byte[] token = (basicAuthName + ":" + basicAuthPass).getBytes();
             headerList.add(new HeaderProperty("Authorization", "Basic " + org.kobjects.base64.Base64.encode(token)));
@@ -139,7 +134,7 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
             if (API_SESSION_EXPIRED_FAULTCODE.equals(e.faultcode)) {
                 // Session expired. Set apiSessionId to null and let it reconnect on retry
                 setApiSessionId(null);
-                Log.d(getClass().getSimpleName(), "Soap api session expired. Trying to reconnect");
+                logger.info("Soap api session expired. Trying to reconnect");
             }
             throw e;
         }
@@ -166,7 +161,7 @@ public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
     private void ensureApiLogin() throws IOException, XmlPullParserException {
         synchronized (lock) {
             if ( getApiSessionId() == null )
-                setApiSessionId((String) send("login", "username", soapApiUser, "apiKey", soapApiPass));
+                setApiSessionId((String) send("login", "username", config.getSoapApiUser(), "apiKey", config.getSoapApiPass()));
         }
 
     }

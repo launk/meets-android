@@ -1,25 +1,18 @@
 package com.theagilemonkeys.meets;
 
 import com.octo.android.robospice.persistence.DurationInMillis;
-import com.octo.android.robospice.persistence.exception.KeySanitationExcepion;
-import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.persistence.keysanitation.DefaultKeySanitizer;
-import com.octo.android.robospice.request.googlehttpclient.GoogleHttpClientSpiceRequest;
-import com.octo.android.robospice.request.listener.RequestListener;
 import com.theagilemonkeys.meets.utils.StringUtils;
+import org.apache.commons.codec.binary.Base64;
 
 import org.jdeferred.Deferred;
 import org.jdeferred.impl.DeferredObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Android Meets SDK
@@ -93,35 +86,23 @@ public abstract class ApiMethod<RESULT> {
         return run(params, Arrays.asList(urlExtraSegments));
     }
 
-    public Deferred run(Map<String, Object> params, List<String> urlExtraSegments){
+    public Deferred run(Map<String, Object> params, List<String> urlExtraSegments) {
         runDeferred = new DeferredObject();
 
         prepareParams(params, urlExtraSegments);
-        makeRequest();
+
+        config.getRequestWrapper(this).makeRequest(runDeferred, getCacheKey());
 
         return runDeferred;
     }
 
-    public RESULT syncRun(Map<String, Object> params, List<String> urlExtraSegments) throws Exception {
-        prepareParams(params, urlExtraSegments);
-        return loadDataFromNetwork();
-    }
+//    public RESULT syncRun(Map<String, Object> params, List<String> urlExtraSegments) throws Exception {
+//        prepareParams(params, urlExtraSegments);
+//        return loadDataFromNetwork();
+//    }
 
+    public abstract RESULT loadDataFromNetwork() throws Exception;
 
-
-    @Override
-    public void onRequestFailure(SpiceException e) {
-        if(runDeferred.isPending()) {
-            runDeferred.reject(e);
-        }
-    }
-
-    @Override
-    public void onRequestSuccess(RESULT response) {
-        if(runDeferred.isPending()) {
-            runDeferred.resolve(response);
-        }
-    }
 
     private void prepareParams(Map<String, Object> params, List<String> urlExtraSegments) {
         this.params = new TreeMap(String.CASE_INSENSITIVE_ORDER);
@@ -139,13 +120,15 @@ public abstract class ApiMethod<RESULT> {
     }
 
     public String getCacheKey(){
-        String key = null;
+        return sanitizeCacheKey(generateUrl());
+    }
+
+    private String sanitizeCacheKey(String key) {
         try {
-            key = (String) new DefaultKeySanitizer().sanitizeKey(generateUrl());
-        } catch (KeySanitationExcepion e) {
-            e.printStackTrace();
+            return new String(Base64.encodeBase64(key.getBytes("UTF-8")));
+        } catch (UnsupportedEncodingException e) {
+            return null;
         }
-        return key;
     }
 
     protected abstract String getBaseUrl();

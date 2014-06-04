@@ -20,7 +20,7 @@ public interface MeetsProduct extends MeetsModel<MeetsProduct> {
     double getPrice();
     double getPriceOfConfiguration(Configuration config);
     double getPriceOfSelectedConfiguration();
-    String getImageUrl();
+    Object getImageUrl();
     List<String> getImages();
     List<MeetsProduct> getAssociatedProducts();
 

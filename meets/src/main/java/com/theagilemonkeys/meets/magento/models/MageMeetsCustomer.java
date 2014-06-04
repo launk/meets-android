@@ -56,8 +56,8 @@ public class MageMeetsCustomer extends MageMeetsModel<MeetsCustomer> implements 
     @Key private List<MeetsAddress> addresses;
 
     {
-        store_id = Meets.storeId;
-        website_id = Meets.websiteId;
+        store_id = Meets.getConfig().getStoreId();
+        website_id = Meets.getConfig().getWebsiteId();
     }
 
     //This is specific of magento

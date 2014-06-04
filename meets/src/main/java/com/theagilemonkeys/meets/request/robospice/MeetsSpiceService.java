@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.octo.android.robospice.Jackson2GoogleHttpClientSpiceService;
 
+import com.octo.android.robospice.SpiceService;
 import roboguice.util.temp.Ln;
 
 /**

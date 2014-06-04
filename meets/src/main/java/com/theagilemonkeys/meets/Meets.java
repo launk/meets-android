@@ -1,11 +1,5 @@
 package com.theagilemonkeys.meets;
 
-import android.content.Context;
-
-import com.octo.android.robospice.SpiceManager;
-import com.theagilemonkeys.meets.magento.RestApiMethod;
-import com.theagilemonkeys.meets.magento.SoapApiMethod;
-import com.theagilemonkeys.meets.models.base.MeetsFactory;
 import com.theagilemonkeys.meets.models.base.MeetsListener;
 
 /**

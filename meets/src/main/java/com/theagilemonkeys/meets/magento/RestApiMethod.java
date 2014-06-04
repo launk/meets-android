@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64;
 import com.theagilemonkeys.meets.ApiMethod;
 import com.theagilemonkeys.meets.utils.MeetsSerializable;
 
@@ -19,17 +19,13 @@ import java.net.URL;
  */
 public class RestApiMethod<RESULT> extends ApiMethod<RESULT> {
 
-    //These properties needs to be configured on app init
-    public static String baseUrl;
-
-
     public RestApiMethod(Class magentoModelClass) {
         super(magentoModelClass);
     }
 
     @Override
     protected String getBaseUrl() {
-        return baseUrl;
+        return config.getRestBaseUrl();
     }
 
     @Override
@@ -41,8 +37,8 @@ public class RestApiMethod<RESULT> extends ApiMethod<RESULT> {
         urlConn.setRequestProperty("Accept", "application/json");
         urlConn.setRequestProperty("Content-Type", "application/json");
 
-        String basicAuthName = getBasicAuthName();
-        String basicAuthPass = getBasicAuthPass();
+        String basicAuthName = config.getBasicAuthName();
+        String basicAuthPass = config.getBasicAuthPass();
         if (basicAuthName != null && basicAuthPass != null) {
             byte[] token = (basicAuthName + ":" + basicAuthPass).getBytes();
             urlConn.setRequestProperty("Authorization", "Basic " + new String(Base64.encodeBase64(token)));

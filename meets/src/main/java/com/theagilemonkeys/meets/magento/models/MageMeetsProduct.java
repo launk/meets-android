@@ -30,7 +30,7 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     @Key private String name;
     @Key private String description;
     @Key private String short_description;
-    @Key private String image_url;
+    @Key private Object image_url;
     @Key private Double final_price_with_tax;
     @Key private String price;
 
@@ -94,7 +94,7 @@ public class MageMeetsProduct extends MageMeetsModel<MeetsProduct> implements Me
     }
 
     @Override
-    public String getImageUrl() {
+    public Object getImageUrl() {
         return image_url;
     }
 

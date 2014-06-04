@@ -1,22 +1,12 @@
 package com.theagilemonkeys.meets.request.robospice;
 
-import com.octo.android.robospice.persistence.DurationInMillis;
-import com.octo.android.robospice.persistence.exception.KeySanitationExcepion;
+import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
-import com.octo.android.robospice.persistence.keysanitation.DefaultKeySanitizer;
 import com.octo.android.robospice.request.SpiceRequest;
-import com.octo.android.robospice.request.googlehttpclient.GoogleHttpClientSpiceRequest;
 import com.octo.android.robospice.request.listener.RequestListener;
 import com.theagilemonkeys.meets.ApiMethod;
-import com.theagilemonkeys.meets.Meets;
-import com.theagilemonkeys.meets.MeetsDefaultConfig;
-import com.theagilemonkeys.meets.utils.StringUtils;
+import com.theagilemonkeys.meets.request.RequestWrapper;
 import org.jdeferred.Deferred;
-import org.jdeferred.impl.DeferredObject;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Android Meets SDK
@@ -24,50 +14,68 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author Álvaro López Espinosa
  */
-public class SpiceRequestWrapper<RESULT> extends SpiceRequest<RESULT> implements RequestListener<RESULT> {
+public class SpiceRequestWrapper<RESULT> implements RequestWrapper<RESULT> {
 
-    private MeetsRobospiceConfig config;
     private ApiMethod<RESULT> method;
+    private SpiceManager spiceManager;
 
-    public SpiceRequestWrapper(MeetsRobospiceConfig config, ApiMethod<RESULT> method){
-        super(method.getResponseClass());
-        this.config = config;
+    public SpiceRequestWrapper(SpiceManager spiceManager, ApiMethod<RESULT> method) {
         this.method = method;
+        this.spiceManager = spiceManager;
     }
 
-    private void makeRequest() {
-        makeRequest(null);
+    @Override
+    public void makeRequest(Deferred deferred) {
+        makeRequest(deferred, null);
     }
 
-    private void makeRequest(String cacheKey) {
+    @Override
+    public void makeRequest(Deferred deferred, String cacheKey) {
+        MeetsSpiceRequest request = new MeetsSpiceRequest(method.getResponseClass());
+        MeetsRequestListener listener = new MeetsRequestListener(deferred);
+
         if (cacheKey != null && method.getCacheDuration() >= 0){
             if (method.isAlwaysGetFromCacheFirst())
-                config.getSpiceManager().getFromCacheAndLoadFromNetworkIfExpired(this, cacheKey, method.getCacheDuration(), this);
+                spiceManager.getFromCacheAndLoadFromNetworkIfExpired(request, cacheKey, method.getCacheDuration(), listener);
             else
-                config.getSpiceManager().execute(this, cacheKey, method.getCacheDuration(), this);
+                spiceManager.execute(request, cacheKey, method.getCacheDuration(), listener);
         }
         else {
-            config.getSpiceManager().execute(this, this);
+            spiceManager.execute(request, listener);
         }
     }
 
-    @Override
-    public RESULT loadDataFromNetwork() throws Exception {
-        return method.loadDataFromNetwork();
-    }
+    private class MeetsSpiceRequest extends SpiceRequest<RESULT> {
+        public MeetsSpiceRequest(Class<RESULT> clazz) {
+            super(clazz);
+        }
 
-    @Override
-    public void onRequestFailure(SpiceException e) {
-        if(runDeferred.isPending()) {
-            runDeferred.reject(e);
+        @Override
+        public RESULT loadDataFromNetwork() throws Exception {
+            return method.loadDataFromNetwork();
         }
     }
 
-    @Override
-    public void onRequestSuccess(RESULT response) {
-        if(runDeferred.isPending()) {
-            runDeferred.resolve(response);
-        }
-    }
+    @SuppressWarnings("unchecked")
+    private class MeetsRequestListener implements RequestListener<RESULT> {
+        private Deferred deferred;
 
+        public MeetsRequestListener(Deferred deferred) {
+            this.deferred = deferred;
+        }
+
+        @Override
+        public void onRequestFailure(SpiceException spiceException) {
+            if(deferred.isPending()) {
+                deferred.reject(spiceException);
+            }
+        }
+
+        @Override
+        public void onRequestSuccess(RESULT result) {
+            if(deferred.isPending()) {
+                deferred.resolve(result);
+            }
+        }
+    };
 }

@@ -55,7 +55,7 @@ public class ApiMethodModelHelper<MODEL> implements ApiMethodModelHelperInterfac
         }
 
         if ( forceNextCacheEnable != null ) {
-            method.setCacheDuration(forceNextCacheEnable ? ApiMethod.globalCacheDuration.get() : DurationInMillis.ALWAYS_EXPIRED);
+            method.setCacheDuration(forceNextCacheEnable ? method.getCacheDuration() : DurationInMillis.ALWAYS_EXPIRED);
             forceNextCacheEnable = null;
         }
 
