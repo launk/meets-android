@@ -1,0 +1,9 @@
+apply plugin: 'java'
+
+dependencies {
+    compile 'commons-codec:commons-codec:1.9'
+    compile 'org.jdeferred:jdeferred-core:1.2.0'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.3.2'
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
