@@ -1,6 +1,5 @@
 package com.theagilemonkeys.meets.magento;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theagilemonkeys.meets.ApiMethod;
 import com.theagilemonkeys.meets.utils.soap.SoapParser;
@@ -32,7 +31,7 @@ import java.util.Map;
  */
 public class SoapApiMethod<RESULT> extends ApiMethod<RESULT> {
     private static final String TAG = "----> SoapApiMethod";
-    final protected Logger logger = LoggerFactory.getLogger(SoapApiMethod.class);
+    protected Logger logger = LoggerFactory.getLogger(SoapApiMethod.class);
     private static String apiSessionId;
     private static final Object lock = new Object();
 

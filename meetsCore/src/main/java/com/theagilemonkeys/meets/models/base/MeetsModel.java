@@ -1,7 +1,10 @@
 package com.theagilemonkeys.meets.models.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.theagilemonkeys.meets.ApiMethodModelHelperInterface;
 import com.theagilemonkeys.meets.utils.MeetsSerializable;
+
+import java.util.Map;
 
 /**
  * Android Meets SDK
@@ -27,6 +30,7 @@ public interface MeetsModel<MODEL> extends ApiMethodModelHelperInterface<MODEL>,
     /**
      * Returns true if the model still does not have a valid id.
      */
+    @JsonIgnore
     boolean isNew();
 
     /**
@@ -35,5 +39,18 @@ public interface MeetsModel<MODEL> extends ApiMethodModelHelperInterface<MODEL>,
      * @param model The model to copy from
      * @return This model
      */
-     MODEL shallowCopyFrom(MODEL model);
+    MODEL shallowCopyFrom(MODEL model);
+
+    /**
+     * Returns a map representation of the model.
+     * @param option Option to determine how to construct the Map. By default is {@link com.theagilemonkeys.meets.models.base.MeetsModel.AsMapOption#PUBLIC_GETTERS}
+     * @return The map of the model
+     */
+    Map<String, Object> asMap(AsMapOption option);
+    Map<String, Object> asMap();
+
+    enum AsMapOption {
+        PUBLIC_GETTERS,
+        ALL_FIELDS
+    }
 }

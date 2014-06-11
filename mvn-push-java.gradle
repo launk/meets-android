@@ -1,0 +1,22 @@
+
+
+task javaJavadocs(type: Javadoc) {
+    source = sourceSets.main.allJava
+}
+
+task javaJavadocsJar(type: Jar, dependsOn: javaJavadocs) {
+    classifier = 'javadoc'
+    from javaJavadocs.destinationDir
+}
+
+task javaSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javaSourcesJar
+    archives javaJavadocsJar
+}
+
+apply from: '../mvn-push.gradle'

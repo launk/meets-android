@@ -3,6 +3,7 @@ package com.theagilemonkeys.meets.models.base;
 import com.theagilemonkeys.meets.ApiMethodModelHelperInterface;
 import com.theagilemonkeys.meets.utils.MeetsSerializable;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -104,4 +105,12 @@ public interface MeetsCollection<MODEL> extends ApiMethodModelHelperInterface<Me
      * @return
      */
     MeetsCollection<MODEL> include(String... weakAttributes);
+
+    /**
+     * Returns a list of maps representing the collection.
+     * @param option Option to determine how to construct the Maps. By default is {@link com.theagilemonkeys.meets.models.base.MeetsModel.AsMapOption#PUBLIC_GETTERS}
+     * @return The list of maps
+     */
+    List<Map<String, Object>> asMapList(MeetsModel.AsMapOption option);
+    List<Map<String, Object>> asMapList();
 }

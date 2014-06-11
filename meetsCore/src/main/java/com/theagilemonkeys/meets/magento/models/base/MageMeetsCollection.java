@@ -12,10 +12,7 @@ import org.jdeferred.DonePipe;
 import org.jdeferred.FailPipe;
 import org.jdeferred.Promise;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Android Meets SDK
@@ -174,6 +171,20 @@ public class MageMeetsCollection<MODEL extends MeetsModel> extends ArrayList<MOD
     @Override
     public MeetsCollection<MODEL> include(String... weakAttributes) {
         throw new UnsupportedOperationException("Still not implemented");
+    }
+
+    @Override
+    public List<Map<String, Object>> asMapList() {
+        return asMapList(MeetsModel.AsMapOption.PUBLIC_GETTERS);
+    }
+
+    @Override
+    public List<Map<String, Object>> asMapList(MeetsModel.AsMapOption option) {
+        List<Map<String, Object>> resList = new ArrayList<Map<String, Object>>();
+        for (MODEL model : this) {
+            resList.add(model.asMap(option));
+        }
+        return resList;
     }
 
     protected transient AlwaysCallback updateAndTrigger = new AlwaysCallback() {
