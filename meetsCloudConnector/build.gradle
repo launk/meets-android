@@ -1,0 +1,9 @@
+apply plugin: 'java'
+apply from: '../mvn-push-java.gradle'
+apply from: '../custom-configurations.gradle'
+
+dependencies {
+//    compileNotRelease project(':Modules:MeetsSDK:meetsCore')
+    compile project(':Modules:MeetsSDK:meetsCore')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}

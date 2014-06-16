@@ -1,0 +1,8 @@
+configurations {
+    compileAndMerge.extendsFrom(compile)
+    compileNotRelease.extendsFrom(compile)
+}
+
+sourceSets.all {
+    compileClasspath += configurations.compileAndMerge + configurations.compileNotRelease
+}

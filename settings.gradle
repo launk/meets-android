@@ -1,1 +1,1 @@
-include 'meetsCore', 'meetsAndroid'
+include 'meetsCore', 'meetsAndroid', 'meetsMagentoConnector', 'meetsCloudConnector'

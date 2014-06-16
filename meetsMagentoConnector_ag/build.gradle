@@ -1,0 +1,7 @@
+apply plugin: 'java'
+
+dependencies {
+    compile project(':Modules:MeetsSDK:meetsCore')
+//    compile 'com.theagilemonkeys.meets:meets-core:0.1.2'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}

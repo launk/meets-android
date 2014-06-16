@@ -1,8 +1,5 @@
 apply plugin: 'java'
-
-configurations {
-    mergeJars
-}
+apply from: '../mvn-push-java.gradle'
 
 dependencies {
     compile 'commons-codec:commons-codec:1.9'
@@ -10,13 +7,4 @@ dependencies {
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.3.2'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
-
-    mergeJars fileTree(dir: 'libs', include: ['*.jar'])
 }
-
-jar {
-    // Include all jars inside libs in our own jar
-    from configurations.mergeJars.collect { it.isDirectory() ? it : zipTree(it) }
-}
-
-apply from: '../mvn-push-java.gradle'

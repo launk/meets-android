@@ -1,0 +1,16 @@
+apply plugin: 'java'
+apply from: '../mvn-push-java.gradle'
+apply from: '../custom-configurations.gradle'
+
+dependencies {
+//    compileExcludeRelease project(':Modules:MeetsSDK:meetsCore')
+//    compile 'com.theagilemonkeys.meets:meets-core:0.1.2'
+    compileNotRelease project(':Modules:MeetsSDK:meetsCore')
+//    compileAndMerge fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+jar {
+    // Include all jars inside libs in our own jar
+    from configurations.compileAndMerge.collect { it.isDirectory() ? it : zipTree(it) }
+}
